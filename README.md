@@ -155,14 +155,98 @@ server.listen(8000);
 
 ---
 
-## Section 3: Socket.io 101
+## Section 3: Socket.io 101 
+### socket.io (v4)
+### this section explains networking
+### Intro
+### Why socketio?
+    - Websockets -> when user is behind misconfigured proxy, need to handle it
+    - Websockets -> server goes down - no automatic reconnection
+    - Websockets -> when multiple rooms support required, need multiple connections created (no multiplexing)
+    - Websockets -> need to implement acknowledgements
+    - Websockets -> need to implement long polling for older browsers...
+    - to handle all of the above if you make it yourself, you are re-developing socketio
+    - socketio based on engine.io which implements websockets
+    - socketio uses websockets whenever it can
 
-### Section 4: Section 2: Make a Slack
+### basics of socketio
+    - EXERCISE_FILES: `02-socketIO101/`
+    - socketio is always run on a server with socketio
+    - here we build a basic chat
+### pitfall connect/reconnect
+    - you shouldnt register event handlers in the connect handler itself, as a new handler will be registered every time the socket reconnects
+    ```js
+    <!-- BAD -->
+    socket.on('connect', ()=>{
+        socket.on('data', ()=>{})
+    });
 
-### Section 5: Multiplayer Canvas Game (Agar.io)
+    <!-- GOOD -->
+    socket.on('conect', ()=>{})
+    socket.on('data', ()=>{})
+    ```
+```html
+<!-- client
+public/basicTheRightWay.html -->
 
-### Section 6: Advanced Project with React (cluster module / redis adapter)
+<!-- socket.io.js is added by the server side: socketio server -->
+<script src="/socket.io/socket.io.js"></script>
 
-### Section 7: Admin UI
 
-### Section 8: Supplemental Videos
+<script>
+    //socket.io.js is going to add the io object the global scope
+    // console.log(io);
+    const socket = io('http://localhost:8000');
+    // console.log(socket);
+    socket.on('connect',()=>{
+        console.log(socket.id)
+        socket.emit('messageFromClient',{data:"Hello, from the browser!"}) 
+    })
+
+    socket.on('messageFromServer',(data)=>{
+        console.log(data);
+    })    
+
+    //note: reconnect is on "socket.io.on()"
+    socket.io.on('reconnect',(data)=>{
+        console.log('reconnect event!!!')
+        console.log(data)
+    })
+
+</script>
+
+```
+
+```js
+//server
+//basics.js
+const express = require('express');
+const app = express();
+const socketio = require('socket.io');
+
+app.use(express.static(__dirname + '/public'));     //render anything in public folder as if its on root url
+
+const expressServer = app.listen(8000); //server listen to port 8000
+const io = socketio(expressServer);     //pass socket server the express server
+
+io.on('connection',(socket)=>{
+    console.log(socket.id,"has connected")
+    //in ws we use "send" method, and it socket.io we use the "emit" method
+    socket.emit('messageFromServer',{data:"Welcome to the socket server!"})
+    socket.on('messageFromClient',(data)=>{
+        console.log("Data:",data);
+    })
+});
+
+```
+
+
+## Section 4: Section 2: Make a Slack
+
+## Section 5: Multiplayer Canvas Game (Agar.io)
+
+## Section 6: Advanced Project with React (cluster module / redis adapter)
+
+## Section 7: Admin UI
+
+## Section 8: Supplemental Videos
