@@ -4,9 +4,9 @@ const socketio = require('socket.io')
 
 app.use(express.static(__dirname + '/public'));
 
-const expressServer = app.listen(8001);
+const expressServer = app.listen(8000);
 // io = the server object in the docs!
-const io = socketio(expressServer)
+const io = socketio(expressServer);
 
 
 io.on('connection',(socket)=>{

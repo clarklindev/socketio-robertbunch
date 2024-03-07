@@ -185,6 +185,20 @@ server.listen(8000);
     socket.on('conect', ()=>{})
     socket.on('data', ()=>{})
     ```
+### basic chat example
+- if you get error running server with nodemon 
+`cannot be loaded because running scripts is disabled on this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170`
+FIX:
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+```
+- io.emit() - all client listener sockets get the message from server
+```cmd
+nodemon chat.js
+```
+- then in browser open the url the server is set up to: http://localhost:8000/chat.html
+
+
 ```html
 <!-- client
 public/basicTheRightWay.html -->
