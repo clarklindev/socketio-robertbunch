@@ -4,6 +4,7 @@
   "description": "",
   "main": "basics.js",
   "scripts": {
+    "dev": "nodemon chat.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

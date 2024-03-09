@@ -88,7 +88,7 @@
 ### native websocket code
 
 #### CLIENTSIDE
-    - PROJECT FOLDER: `01-nativeVWs/justWs.html`
+    - PROJECT FOLDER: `02-nativeVWs/justWs.html`
     - CLIENT: html/js web socket api
         - https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API
         - WebSocket(url, protocol)
@@ -115,7 +115,7 @@
 ```
 
 #### SERVERSIDE
-    - PROJECT FOLDER: `01-nativeVWs/justWsServer.js`
+    - PROJECT FOLDER: `02-nativeVWs/justWsServer.js`
     - SERVER: NODE -> sockets
     - https://github.com/websockets/ws
     - WebSocketServer()
@@ -170,7 +170,7 @@ server.listen(8000);
     - socketio uses websockets whenever it can
 
 ### basics of socketio
-    - EXERCISE_FILES: `02-socketIO101/`
+    - EXERCISE_FILES: `03-socketIO101/`
     - socketio is always run on a server with socketio
     - here we build a basic chat
 ### pitfall connect/reconnect
@@ -254,8 +254,100 @@ io.on('connection',(socket)=>{
 
 ```
 
+### Docs -> Socket Server
+- https://socket.io/docs/v4/server-api/
+- alternative ways to instantiate Server
+
+### Docs -> Socket options
+- https://socket.io/docs/v4/server-options/
+- path (server/client must match)
+- serveClient
+- adapter (out-of-scope)
+- parser (out-of-scope)
+- connectTimeout (out-of-scope)
+- Low-level engine options  (out-of-scope)
+
+### The big 3 (.emit, .on, .connection)
+- on("connection") / .on("connect") same
+- Namespace - name given to group sockets identified by pathname
+### The Client
+- "io()" is global
+- prop location of server
+- io() returns a socket
+
+## Server
+- to talk to specific socket: socket.emit()
+---
 
 ## Section 4: Section 2: Make a Slack
+- https://socket.io/docs/v4/namespaces/
+
+- namespaces/namespaces.js - same as chat.js (server - express)
+- namespaces/public/namespaces.html - same as chat.html (client)
+- namespaces/public/styles.css
+
+- slackClone/public/styles.css - (given)
+- slackClone/public/layout.html - (given)
+- slackClone/public/slack.html
+- slackClone/script.js
+
+### Namespaces & Rooms cheatsheet
+- ALL these are server only
+
+Send an event from the server to this socket only:
+```js
+socket.emit()
+socket.send()
+```
+
+Send an event from a socket to a room:
+NOTE: remember, this will not go to the sending socket
+```js
+socket.to(roomName).emit()
+socket.in(roomName).emit()
+```
+
+Because each socket has it's own room, named by it's socket.id, a socket can send a message to another socket:
+```js
+socket.to(anotherSocketId).emit('hey');
+socket.in(anotherSocketId).emit('hey');
+```
+
+A namespace can send a message to any room:
+```js
+io.of(aNamespace).to(roomName).emit()
+io.of(aNamespace).in(roomName).emit()
+```
+
+A namespace can send a message to the entire namespace
+```js
+io.emit()
+io.of('/').emit()
+io.of('/admin').emit()
+```
+
+### Project Whiteboarding & Steps (11min06sec)
+
+#### Join main namespace
+1. CLIENT -> server : join the main Namespace ('/')
+2. SERVER -> send back namespace info (manage namespaces)
+3. CLIENT -> update DOM namespace data
+
+#### join 2nd namespace
+4. CLIENT -> join 2nd namespace
+5. SERVER -> send group (room) info
+6. CLIENT -> update DOM with group (room) info
+
+#### join group (rooms + namespaces)
+7. CLIENT -> join a group (room)
+8. SERVER -> send group chat history
+9. CLIENT -> update DOM with chat history
+
+#### app listeners
+- namespace changes (steps 4-9)
+- room changes (7-9)
+- new messages: client -> server
+- new messages: server -> clients
 
 ## Section 5: Multiplayer Canvas Game (Agar.io)
 

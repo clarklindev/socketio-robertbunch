@@ -7,8 +7,8 @@ const namespaces = require('./data/namespaces');
 
 app.use(express.static(__dirname + '/public'));
 
-const expressServer = app.listen(9000);
-const io = socketio(expressServer)
+const expressServer = app.listen(9000); //http traffic
+const io = socketio(expressServer)  //socket traffic
 
 app.set('io',io);
 

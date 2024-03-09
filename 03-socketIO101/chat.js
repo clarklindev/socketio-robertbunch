@@ -1,3 +1,7 @@
+
+//to make this chat app work, one window should be in incognito mode, they both open http://localhost:8000/chat.html
+//what it does: sends messages to server, receive feedback from server
+
 const express = require('express');
 const app = express();
 const socketio = require('socket.io')
