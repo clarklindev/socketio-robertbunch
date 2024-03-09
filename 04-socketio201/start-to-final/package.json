@@ -1,0 +1,17 @@
+{
+  "name": "start-to-final",
+  "version": "1.0.0",
+  "description": "- to get this working\r - install packages...\r - `nodemon slackClone/slack.js`\r - localhost:9000/slack.html",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon slackClone/slack.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.3",
+    "socket.io": "^4.7.4"
+  }
+}
