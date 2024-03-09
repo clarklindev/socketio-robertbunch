@@ -330,8 +330,14 @@ io.of('/admin').emit()
 
 #### Join main namespace
 1. CLIENT -> server : join the main Namespace ('/')
-2. SERVER -> send back namespace info (manage namespaces)
-3. CLIENT -> update DOM namespace data
+    - lesson 27
+2. SERVER -> send back namespace info (manage namespaces) 
+    - lesson 28 - populate spaces and rooms from the server
+        - fake user/password (requires AUTHENTICATION - out-of-scope for course)
+        - nsList - listen for nsList event from server -> returns namespaces
+        - server emit "nsList" - send namespaces to client
+
+3. CLIENT -> lesson 28 - update DOM namespace data
 
 #### join 2nd namespace
 4. CLIENT -> join 2nd namespace

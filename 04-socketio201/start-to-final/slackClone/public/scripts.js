@@ -1,5 +1,9 @@
 // CLIENT
+
 //console logs are output on browser console
+//fake authentication - user login
+const userName = prompt('what is your username?');
+const password = prompt('what is your password?');
 
 const socket = io('http://localhost:9000');
 
@@ -14,7 +18,16 @@ socket.on('welcome', ()=>{
     socket.on('welcome', (data)=>{
         console.log(data);
     })
-})
+});
+
+// listen for the "nsList" event from the server which gives us the namespaces
+socket.on('nsList', (nsData)=>{
+    console.log('nsData: ', nsData);
+    const namespacesDiv = document.querySelector('.namespaces');
+    nsData.forEach((ns)=>{
+        namespacesDiv.innerHTML += `<div class="namespace" ns="${ns.name}"><img src="${ns.image}"></div>`
+    });
+});
 
 // socket.on('messageFromServer',(data)=>{
 //     console.log(data);
