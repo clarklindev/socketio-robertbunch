@@ -352,6 +352,9 @@ io.of('/admin').emit()
     - get room-list div (querySelector returns first found...thats why it works..prob not best way to do this...)
     - loop through each room and add to DOM
 
+    - lesson 31 -> ensure rooms load initially (before user clicks on namespace)
+        - move loading of rooms to own file
+
 #### join group (rooms + namespaces)
 7. CLIENT -> join a group (room)
 8. SERVER -> send group chat history

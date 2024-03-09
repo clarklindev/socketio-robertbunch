@@ -25,9 +25,12 @@ socket.on('welcome', ()=>{
 
 // listen for the "nsList" event from the server which gives us the namespaces
 socket.on('nsList', (nsData)=>{
+    const lastNs = localStorage.getItem('lastNs');
+
     console.log('nsData: ', nsData);
     const namespacesDiv = document.querySelector('.namespaces');
-    
+    namespacesDiv.innerHTML = "";
+
     //populate namespaces
     nsData.forEach((ns)=>{
         namespacesDiv.innerHTML += `<div class="namespace" ns="${ns.endpoint}"><img src="${ns.image}"></div>`
@@ -37,21 +40,17 @@ socket.on('nsList', (nsData)=>{
     Array.from(document.getElementsByClassName('namespace')).forEach((element)=>{
         console.log('element: ', element);
         element.addEventListener('click', e=>{
-            const nsEndpoint = element.getAttribute('ns');  //gets ns="" attribute 
 
-            //find the ns (returns Namespace instance) in nsData with endpoint same as the one user clicked on
-            const clickedNs = nsData.find(row=> row.endpoint === nsEndpoint);
-            const rooms = clickedNs.rooms;
-
-            //get room-list div
-            const roomList = document.querySelector('.room-list');  //querySelector returns first found...thats why it works..prob not best..
-            roomList.innerHTML = '';
-            //loop through each room and add to DOM
-            rooms.forEach(room=>{
-                roomList.innerHTML += `<li><span class="glyphicon glyphicon-lock"></span>${room.roomTitle}</li>`
-            })
+            //generating rooms externalized to own file "joinNs.js"
+            joinNs(element, nsData);
         });
     });
+
+    //default: initially try get from localstorage: lastNs
+    const getArrayElementIndex = nsData.findIndex((ns, index, array)=>{
+        return (ns.endpoint === lastNs);
+    });
+    joinNs(document.getElementsByClassName('namespace')[getArrayElementIndex > -1 ? getArrayElementIndex: 0], nsData);
 
 });
 
