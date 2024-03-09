@@ -343,6 +343,14 @@ io.of('/admin').emit()
 4. CLIENT -> join 2nd namespace
 5. SERVER -> send group (room) info
 6. CLIENT -> update DOM with group (room) info
+    - update on client: public/script.js use "endpoint" instead of "name" 
+        `<div class="namespace" ns="${ns.endpoint}"><img src="${ns.image}"></div>`
+    - NOTE: `document.getElementsByClassName('namespace')` returns an array-like object that DOM knows how to use...
+    - NOTE: `Array.from(document.getElementsByClassName('namespace'))`  converts to object JS knows how to use...
+    - for each namespace in dom, when clicked on, replace contents of: `<div className="room-list"></div>`
+    - find the ns in nsData with endpoint same as the one user clicked on
+    - get room-list div (querySelector returns first found...thats why it works..prob not best way to do this...)
+    - loop through each room and add to DOM
 
 #### join group (rooms + namespaces)
 7. CLIENT -> join a group (room)
