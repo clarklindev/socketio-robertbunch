@@ -33,7 +33,10 @@ socket.on('nsList', (nsData)=>{
 
     //populate namespaces
     nsData.forEach((ns)=>{
-        namespacesDiv.innerHTML += `<div class="namespace" ns="${ns.endpoint}"><img src="${ns.image}"></div>`
+        namespacesDiv.innerHTML += `<div class="namespace" ns="${ns.endpoint}"><img src="${ns.image}"></div>`;
+
+        // join the namespace with io()
+        io(`http://localhost:9000${ns.endpoint}`);
     });
 
     //populate rooms

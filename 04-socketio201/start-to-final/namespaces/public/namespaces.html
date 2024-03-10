@@ -44,13 +44,14 @@
 
     const socket = io('http://localhost:8001');
     const adminSocket = io('http://localhost:8001/admin');
+    
     socket.on('connect',()=>{
         //do connect type stuff
         console.log("Successfully joined the main ns");
     })
 
     socket.on('welcomeToChatRoom',(data)=>{
-        console.log("Welcome to the main chat room")
+        console.log("Welcome to the main chat room");
     })
 
     socket.on('messageFromServer',(dataFromServer)=>{

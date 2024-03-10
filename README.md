@@ -326,7 +326,7 @@ io.of('/').emit()
 io.of('/admin').emit()
 ```
 
-### Project Whiteboarding & Steps (11min06sec)
+## Project Whiteboarding & Steps (11min06sec)
 
 #### Join main namespace
 1. CLIENT -> server : join the main Namespace ('/')
@@ -354,6 +354,7 @@ io.of('/admin').emit()
 
     - lesson 31 -> ensure rooms load initially (before user clicks on namespace)
         - move loading of rooms to own file
+    - lesson 32 -> cleanup - use localStorage to store last active namespace, if browser refreshes, retrieve from localstorage
 
 #### join group (rooms + namespaces)
 7. CLIENT -> join a group (room)
@@ -365,6 +366,118 @@ io.of('/admin').emit()
 - room changes (7-9)
 - new messages: client -> server
 - new messages: server -> clients
+
+
+### Namespaces
+- allows Multiplexing -> communication channel that allows you to split the logic of your application over a single shared connection.
+- eg. a single TCP connection that can manage the client being in more than one workspace at a time and visa versa on the server.
+- socketio benefit over native websocket is multiplexing
+- the main namespace is "/"
+- the io instance inherits all of its methods: `io.on('connection', ()=>{})` same as `io.of("/").on('connection', ()=>{})`
+- io.on('') same as io.of('/').on('')
+- io.use('') same as io.of('/').use('')
+- io.emit('') same as io.of('/').emit('')
+
+---
+
+### ROOMS
+- Rooms are *(server only concept) where sockets on server can join and leave
+- ALWAYS REFERS TO SOCKET IN THE SERVER - CLIENT HAS NO IDEA THEY EXIST - Client does not have access to the list of rooms it has joined
+- rooms can be used to "broadcast events" to a subset of clients
+
+#### JOINING a room
+- use .join(str) where string is name of a room 
+```js
+// joining and leaving
+io.on('connection', (socket)=>{
+    socket.join("some room");
+})
+```
+
+#### BROADCASTING / EMITTING with to() or in()
+- use to(str) or in(str) when broadcasting/emitting
+```js
+io.to('some room').emit('some event');
+```
+
+#### EMIT to SEVERAL ROOMS
+- here a UNION is performed so if a socket is in more than one room, it will only get the event ONCE
+```js
+io.to('room1').to('room2').to('room3').emit('some event');
+```
+
+### BROADCAST TO A ROOM FROM A GIVEN SOCKET
+```js
+io.on('connection', (socket)=>{
+    socket.to('some room').emit('some event');
+});
+```
+
+### BROADCAST TO A PARTICULAR DEVICE
+```js
+io.on('connection', async (socket)=>{
+    const userId = await fetchUserId(socket);
+    socket.join(userId);
+    io.to(userId).emit("hi");
+});
+```
+
+### DISCONNECTION
+- on disconection, sockets "leave" all the channels they were part of automatically.
+
+### Steps 4-6 (lesson 35)
+- join 2nd namespace
+- send room info
+- update dom with room info
+
+#### CLIENT
+- browser trying to connect to namespaces  (each a socket)
+- always join the main namespace, because thats where the client gets the other namespaces from
+- dynamically connect using data we get back from server via nsdata
+- steps: 
+    1. client connects
+    2. CLIENT connected -> emits "clientConnect"
+    3. SERVER listens for "clientConnect"
+    4. SERVER when it receives "clientConnect", it emits "nsList" which has value namespaces
+    5. CLIENT receives nsList, updates DOM, and attaches event listeners
+    6. so while its building nsList DOM, its good time to also create the client socket connections by using the namespace data
+    7. test: http://localhost:9000/slack.html   should connect and server should give feedback in terminal
+
+#### SERVER
+- start up server
+```js
+nodemon slackClone/slack.js
+```
+- TODO: for each item, connect to namespace from the data in data/namespaces.js eg. "wiki/", "mozilla/", 'linux/'
+- you need a socket for each one..
+- but we want to do it dynamically
+
+```js
+//SERVER
+//slackClone/slack.js
+namespaces.forEach((namespace)=>{
+    // const thisNs = io.of(namespace.endpoint);
+    // thisNs.on('connection', (socket)=>{
+    // });
+    io.of(namespace.endpoint).on('connection', (socket)=>{
+        console.log(`${socket.id} has connected to ${namespace.endpoint}`)
+    });
+})
+```
+
+```js
+//CLIENT
+//populate namespaces
+//...
+
+    nsData.forEach((ns)=>{
+        namespacesDiv.innerHTML += `<div class="namespace" ns="${ns.endpoint}"><img src="${ns.image}"></div>`;
+
+        // join the namespace with io()
+        io(`http://localhost:9000${ns.endpoint}`)
+    });
+
+```
 
 ## Section 5: Multiplayer Canvas Game (Agar.io)
 
