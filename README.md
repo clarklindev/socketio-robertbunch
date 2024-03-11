@@ -479,6 +479,98 @@ namespaces.forEach((namespace)=>{
 
 ```
 
+### lesson 36 whiteboarding - performance thinking
+- instead of http way of doing things, when namespaces change or things update, the server notifies the sockets of the change.
+
+
+#### SERVER -manufactured way to change a ns (without building a UI)
+1. - update namespaces on server (add room)
+2. - let everyone in this namespace know a change occured: 'nsChange'
+
+```js
+//SERVER
+//slack.js 
+const Room = require('./classes/Room');
+const namespaces = require("./data/namespaces");
+app.get('/change-ns', (req, res)=>{
+    res.json('page hit!');
+    //update namespaces array
+    namespaces[0].addRoom(new Room(0, 'deleted articles', 0));
+    //let everyone know in this namespaces, that it changed.
+    io.of(namespaces[0].endpoint).emit('nsChange', namespaces[0]);
+    res.json(namespaces[0]);
+});
+```
+
+### lesson 37 implementing nsChange and express route -> io.emit
+- NOTE: this video -> Robert shows how to do it the wrong way by registering an event "nsChange" inside an io event "nsList"
+- everytime the event gets triggered (eg. server restart - causes client to disconnect, which will trigger a reconnect "nsList"), this will create a new registered listener ("nsChange") 
+
+### lesson 38 add checks to see if namespace exists or if listeners exists:
+1. Test: http://localhost:9000/slack.html
+2. make sure on terminal (only 4 connections)
+3. make a change on scripts.js (Client)
+4. make sure on terminal (only 4 connections (same as first time))
+5. localhost:9000/change-ns
+6. ensure only single (BROWSER CONSOLE) "namespace changed" event 
+
+### lesson 38 FIX 1 - create nameSpaceSockets[]
+- create nameSpaceSockets[] array outside scope of nsData.forEach((ns)=>{});
+- sockets should be put into this array, at the index of their ns.id
+
+### lesson 38 FIX 2 - create event listeners array
+- array stores listeners and only creates listeners if it doesnt exist yet
+
+```js
+//scripts
+
+//lesson 38 FIX 1 sockets will be put into this array, in the index of their ns.id
+const nameSpaceSockets = [];
+
+//lesson 38 FIX 2 listeners
+const listeners = {
+    nsChange: []
+}
+
+const addListeners = (nsId)=>{
+    if(!listeners.nsChange[nsId]){
+        nameSpaceSockets[nsId].on('nsChange', (data)=>{
+            console.log("NAMESPACE CHANGED");
+            console.log(data);
+        })
+        listeners.nsChange[nsId] = true;
+    }
+    else{
+        //nothing to do - listeners exist
+    }
+}
+
+socket.on('nsList', (nsData)=>{
+    const lastNs = localStorage.getItem('lastNs');
+
+    console.log('nsData: ', nsData);
+    const namespacesDiv = document.querySelector('.namespaces');
+    namespacesDiv.innerHTML = "";
+
+    //populate namespaces
+    nsData.forEach((ns)=>{
+        namespacesDiv.innerHTML += `<div class="namespace" ns="${ns.endpoint}"><img src="${ns.image}"></div>`;
+
+        //ns.id (from Namespace() instance)
+        //initialize thisNs as its index in nameSpaceSockets
+        //if the connection is new, this will be null
+        //if the connection has already been established, it will reconnect and remain in its spot.
+        if(!nameSpaceSockets[ns.id]){
+            // join the namespace with io()
+            // thisNs = io(`http://localhost:9000${ns.endpoint}`);
+            nameSpaceSockets[ns.id] = io(`http://localhost:9000${ns.endpoint}`);
+        }
+        
+        addListeners(ns.id);
+    });
+});
+```
+
 ## Section 5: Multiplayer Canvas Game (Agar.io)
 
 ## Section 6: Advanced Project with React (cluster module / redis adapter)
