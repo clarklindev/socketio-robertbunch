@@ -7,7 +7,7 @@ app.use(express.static(__dirname + '/public'));
 
 const expressServer = app.listen(8001);
 // io = the server object in the docs!
-const io = socketio(expressServer)
+const io = socketio(expressServer);
 
 //NOT USING NAMESPACE
 // io.on('connection', (socket)=>{

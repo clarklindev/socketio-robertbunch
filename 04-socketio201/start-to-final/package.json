@@ -4,7 +4,7 @@
   "description": "- to get this working\r - install packages...\r - `nodemon slackClone/slack.js`\r - localhost:9000/slack.html",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon slackClone/slack.js",
+    "dev": "nodemon slackClone/server-slack.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

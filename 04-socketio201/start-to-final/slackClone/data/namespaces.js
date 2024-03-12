@@ -38,10 +38,10 @@ const linuxNs = new Namespace(
     '/linux'
 )
 
-// ADD ROOMS TO NAMESPACES
+// 29. rooms and namespaces - ADD ROOMS TO NAMESPACES
 wikiNs.addRoom(new Room(0, 'news articles', 0));
 wikiNs.addRoom(new Room(1, 'editors', 0));
-wikiNs.addRoom(new Room(2, 'other', 0));
+wikiNs.addRoom(new Room(2, 'other', 0, true));
 
 mozillaNs.addRoom(new Room(0, 'firefox', 1));
 mozillaNs.addRoom(new Room(1, 'seaMonkey', 1));

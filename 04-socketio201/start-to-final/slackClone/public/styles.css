@@ -1,3 +1,5 @@
+/* CLIENT */
+
 body{
     background-color: #3B4048;
     color: white;
@@ -109,6 +111,7 @@ input {
     max-height: 85%;
     overflow: scroll;
 }
+
 #messages li .user-image{
     /* width: 50px; */
     /* display: inline-block; */
