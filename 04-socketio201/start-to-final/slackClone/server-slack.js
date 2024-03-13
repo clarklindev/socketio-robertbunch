@@ -45,14 +45,32 @@ namespaces.forEach((namespace)=>{
         //roomTitle passed from joinRoom.js - joinRoom()
 
         //lesson 40 acknowlege functions - ackCallBack()
-        socket.on('joinRoom', (roomTitle, ackCallBack)=>{
+        socket.on('joinRoom', async (roomTitle, cb)=>{
             //need to fetch the history
 
-    
+            //leave all rooms, because the client can only be in one room
+            const rooms = socket.rooms; //returns a Set()
+
+            //you can also create a var i=0, then increment i++
+            //as forEach iterates in ascending order
+            Array.from(rooms).forEach((room, index)=>{
+                //we dont want to leave the sockets personal room which is guaranteed to be first
+                if(index !== 0){
+                    socket.leave(room);
+                }
+            });
+
             //join the room
             //NOTE: roomTitle is coming from CLIENT (Not safe) - do auth so user (socket) has right to join room
             socket.join(roomTitle);
-            ackCallBack('I acknowledge you!');
+
+            //fetch the number of sockets in this room
+            const sockets = await io.of(namespace.endpoint).in(roomTitle).fetchSockets();
+            const socketCount = sockets.length;
+
+            cb({
+                numUsers:socketCount
+            });
         });
     });
 });

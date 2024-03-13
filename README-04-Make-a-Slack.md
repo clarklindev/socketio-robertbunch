@@ -310,20 +310,26 @@ socket.on('nsList', (nsData)=>{
 9. update DOM with chat history
  
 ### 40 - Acknowledgements (Acknowledge functions)
-- events are great but in some cases you want a more classic request/response API in socketIO. this feature is named Acknowledgements
+- events are great but in some cases you want a more classic request/response API in socketIO. this feature is named Acknowledgements 
+- req/response like http but with TCP
 - you can add a callback as the last argument of the emit() 
 - this callback will be called once the other side (SERVER calls callback()) acknowledges the event.
 
-
 #### Client
+- client has cb function `(response)=>{}` (last prop of emit)
+
 ```js
+//client
 socket.emit("update item", "1", { name: "updated" }, (response) => {
   console.log(response.status); // ok
 });
 ```
 
 #### Server
+- server does its thing then calls callback()
+
 ```js
+//server
 io.on("connection", (socket) => {
   socket.on("update item", (arg1, arg2, callback) => {
     console.log(arg1); // 1
@@ -334,4 +340,47 @@ io.on("connection", (socket) => {
   });
 });
 ```
+#### .fetchSockets()
+- use .fetchSockets() fetch the number of sockets in this room (get count)
+
+```js
+async ()=>{
+    //fetch the number of sockets in this room
+    const sockets = await io.of(namespace.endpoint).in(roomTitle).fetchSockets();
+    const socketCount = sockets.length;
+    ackCallBack({
+        numUsers:socketCount
+    });
+}
+```
+
+#### leave a room 
+- there is a sockets.rooms to get the rooms a socket is in, `socket.leave(room)`
+- then you loop through and leave each room
+- leave all rooms before joining (except own room) - 
+    because socket's personal room is guaranteed to be first
+- ie. - client can only be in one room (our own restriction..)
+
+#### DEMO
+- the exercise proves that user first leaves a room before joining another
+
+1. window 1 - join a room A
+2. window 2 (incognito) - join a room A
+count should be 2
+3. window 2 (incognito) - join room B
+4. if you click on window 1, room A count should be 1 AND if in window 1 click on room B, count should be 2,
+and click again on room A, count should be 1
+5. on window 2, clicking room B, count should be 1
+
+```js
+const rooms = socket.rooms; //returns a Set()
+
+Array.from(rooms).forEach((room, index)=>{
+    if(index !== 0){
+        socket.leave(room);
+    }
+}) //a Sets() forEach does not have an iterator, convert with Array.from()
+
+```
+
 

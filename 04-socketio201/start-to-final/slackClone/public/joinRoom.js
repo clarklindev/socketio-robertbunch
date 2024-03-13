@@ -10,7 +10,11 @@ const joinRoom = (roomTitle, namespaceId)=>{
     if(nameSpaceSockets){
         //lesson 39 (9min 15sec)
         nameSpaceSockets[namespaceId].emit('joinRoom', roomTitle, ackResp=>{    
-            console.log(ackResp);
+            console.log(ackResp); // {numUsers: 1}
+
+            document.querySelector('.curr-room-text').innerHTML = roomTitle;
+            
+            document.querySelector('.curr-room-num-users').innerHTML = `${ackResp.numUsers}<span class="fa-solid fa-user"></span>`;
         });
     }
 }
