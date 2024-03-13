@@ -383,4 +383,17 @@ Array.from(rooms).forEach((room, index)=>{
 
 ```
 
+### lesson 40 - emitWithAck() ie no callback / using async (since socketio v4.6.0)
 
+```js
+const joinRoom =  async (roomTitle, namespaceId)=>{
+
+    const ackResp = await nameSpaceSockets[namespaceId].emitWithAck('joinRoom', roomTitle);
+    
+    console.log(ackResp); // {numUsers: 1}
+
+    document.querySelector('.curr-room-text').innerHTML = roomTitle;
+    
+    document.querySelector('.curr-room-num-users').innerHTML = `${ackResp.numUsers}<span class="fa-solid fa-user"></span>`;
+}
+```

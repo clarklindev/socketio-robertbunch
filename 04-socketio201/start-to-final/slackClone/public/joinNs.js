@@ -9,15 +9,28 @@ const joinNs = (element, nsData)=>{
 
     //get room-list div
     const roomList = document.querySelector('.room-list');  //querySelector returns first found...thats why it works..prob not best..
+    
+    //clear it out
     roomList.innerHTML = '';
+    
+    //init firstRoom var
+    let firstRoom;
+
     //loop through each room and add to DOM
-    rooms.forEach(room=>{
+    rooms.forEach((room, i)=>{
+        if(i=== 0){
+            firstRoom = room.roomTitle;
+        }
         roomList.innerHTML += `
         <li class="room" namespaceId=${room.namespaceId}>
             <span class="fa-solid fa-${room.privateRoom ? 'lock' : 'globe'}"></span>${room.roomTitle}
         </li>
         `
     });
+
+    //init join first room
+    joinRoom(firstRoom, clickedNs.id);
+
 
     //lesson 39 - add click listener to each room so the client can tell the server it wants to join
     // - get namespaceId from room and add to DOM, access this and pass to joinRoom()

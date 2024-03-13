@@ -45,7 +45,7 @@ namespaces.forEach((namespace)=>{
         //roomTitle passed from joinRoom.js - joinRoom()
 
         //lesson 40 acknowlege functions - ackCallBack()
-        socket.on('joinRoom', async (roomTitle, cb)=>{
+        socket.on('joinRoom', async (roomTitle, ackCallback)=>{
             //need to fetch the history
 
             //leave all rooms, because the client can only be in one room
@@ -68,7 +68,7 @@ namespaces.forEach((namespace)=>{
             const sockets = await io.of(namespace.endpoint).in(roomTitle).fetchSockets();
             const socketCount = sockets.length;
 
-            cb({
+            ackCallback({
                 numUsers:socketCount
             });
         });
