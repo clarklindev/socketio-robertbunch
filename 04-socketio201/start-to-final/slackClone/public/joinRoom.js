@@ -23,13 +23,26 @@
 //lesson 40 - emitWithAck() ie no callback / using async
 const joinRoom =  async (roomTitle, namespaceId)=>{
 
-    const ackResp = await nameSpaceSockets[namespaceId].emitWithAck('joinRoom', roomTitle);
+    const ackResp = await nameSpaceSockets[namespaceId].emitWithAck('joinRoom', {roomTitle, namespaceId});
     
-    console.log(ackResp); // {numUsers: 1}
+/* SERVER: 
+socket.on('joinRoom', async (roomObj, ackCallback)=>{ 
+    ackCallback({
+        numUsers:socketCount,
+        thisRoomsHistory
+    });
+}
+*/
+    console.log(ackResp.thisRoomsHistory); // ackResp = {numUsers: socketCount, thisRoomsHistory}
 
     document.querySelector('.curr-room-text').innerHTML = roomTitle;
-    
     document.querySelector('.curr-room-num-users').innerHTML = `${ackResp.numUsers}<span class="fa-solid fa-user"></span>`;
+
+    document.querySelector('#messages').innerHTML = "";
+
+    ackResp.thisRoomsHistory.forEach(message=>{
+        document.querySelector('#messages').innerHTML += buildMessageHtml(message);
+    });
 }
 
 

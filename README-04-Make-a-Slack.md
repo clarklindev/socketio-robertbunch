@@ -1,4 +1,4 @@
-## Section 4: Section 2: Make a Slack
+## Section 4: Make a Slack
 - https://socket.io/docs/v4/namespaces/
 
 - namespaces/namespaces.js - same as chat.js (server - express)
@@ -488,7 +488,6 @@ const joinNs = (element, nsData)=>{
 //SERVER
 socket.on('newMessageToRoom', (messageObj)=>{
     console.log('messageObj:', messageObj);
-
     //sever should broadcast to all sockets in this room
     //how can we find out what room this socket is in?
         //0 index is sockets personal room
@@ -501,4 +500,119 @@ socket.on('newMessageToRoom', (messageObj)=>{
 });
 ```
 ### 43. Slack - Sending the history - (Steps 7-9 continued)
+- make the message html dynamic call this (CLIENT): `document.querySelector('#messages').innerHTML += buildMessageHtml(messageObj);`
+- call buildMessageHtml(messageObj)
+- CLIENT: add "selectedNsId" to messageObj 
+    ```js
+    //client-scripts.js
+    nameSpaceSockets[selectedNsId].emit('newMessageToRoom', {
+        newMessage,
+        date: Date.now(),
+        avatar: 'https://via.placeholder.com/30',
+        userName,
+        selectedNsId,
+    });
+    ```
+- SERVER: add message to history `socket.on('newMessageToRoom', messageObj=>{})`
+- SERVER: find the room via namespace by matching currentRoom
+- SERVER: add message to room (adds to history)
+- SERVER: ensure history updates - history comes with initial load, but it needs to update when changing rooms
 
+```js
+//SERVER - server-slack.js
+socket.on('newMessageToRoom', messageObj=>{
+    
+    //...
+    const currentRoom = [...rooms][1];
+
+    //send out messageObj
+    io.of(namespace.endpoint).in(currentRoom).emit('messageToRoom', messageObj);
+
+    //add this message to this rooms history
+    const thisNs = namespaces[messageObj.selectedNsId];
+    const thisRoom = thisNs.rooms.find(room=> room.roomTitle === currentRoom);
+    console.log(thisRoom);
+
+    //push message on rooms history[] array
+    thisRoom.addMessage(messageObj);
+});
+```
+
+```js
+//CLIENT
+//client-scripts.js
+const buildMessageHtml = (messageObj)=>{
+return `
+    <li>
+    <div class="user-image">
+        <img src="${messageObj.avatar}"/> 
+    </div>
+    <div class="user-message">
+        <div class="user-name-time">${messageObj.userName} <span>${new Date(messageObj.date).toLocaleString()}</span></div>
+        <div class="message-text">${messageObj.newMessage}</div>
+    </div>
+</li>    
+`;
+}
+```
+
+### joinRoom
+- update so you send object instead of roomTitle: {roomTile, nameSpaceId}
+- server-slack.js update "joinRoom" handler to receive object - roomObj
+- externalize buildHTML() into its own file "buildMessageHTML.js"
+
+```js
+//joinRoom.js
+const joinRoom =  async (roomTitle, namespaceId)=>{
+
+    const ackResp = await nameSpaceSockets[namespaceId].emitWithAck('joinRoom', {roomTitle, namespaceId});
+    
+    console.log(ackResp); // {numUsers: 1, thisRoomsHistory}
+ 
+    document.querySelector('.curr-room-text').innerHTML = roomTitle;
+    document.querySelector('.curr-room-num-users').innerHTML = `${ackResp.numUsers}<span class="fa-solid fa-user"></span>`;
+
+       //we also get back thisRoomsHistory in ackResp
+    document.querySelector('#messages').innerHTML = '';
+
+    ackResp.thisRoomsHistory.forEach(message=>{
+        document.querySelector('#messages').innerHTML += buildMessageHtml(message);
+    });
+}
+
+```
+
+- SERVER: with the adjustments - can and need to fetch using roomObj ("namespaceId")
+- SERVER: go through the rooms stored in this namespace, find a room (roomTitle) which is equal to the joinRoom roomObj.roomTitle prop
+- SERVER: then pass thisRoomsHistory into the callback ackCallback()
+- CLIENT: from ackResp -> thisRoomsHistory received 
+```js
+//SERVER
+namespaces.forEach((namespace)=>{
+    io.of(namespace.endpoint).on('connection', (socket)=>{
+        
+        // socket.on('joinRoom', async (roomTitle, ackCallback)=>{
+        // });
+
+        //UPDATE: receive an object with roomTitle AND namespaceId
+        socket.on('joinRoom', async (roomObj, ackCallback)=>{
+            //need to fetch history
+            const thisNs = namespaces[roomObj.namespaceId];
+
+            //roomInstance 
+            const thisRoomObj = thisNs.rooms.find(room=> room.roomTitle === roomObj.roomTitle);
+
+            const thisRoomsHistory = thisRoomObj.history;
+
+            //...
+
+            ackCallback({
+                numUsers:socketCount,
+                thisRoomsHistory
+            });
+
+        });
+
+    });
+});
+```

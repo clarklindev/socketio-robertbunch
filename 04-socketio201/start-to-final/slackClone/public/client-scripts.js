@@ -36,8 +36,11 @@ document.querySelector('#message-form').addEventListener('submit', (e)=>{
         newMessage,
         date: Date.now(),
         avatar: 'https://via.placeholder.com/30',
-        userName
+        userName,
+        selectedNsId,
     });
+
+    document.querySelector('#user-message').value = '';
 })
 
 //lesson 38 (7min2sec)
@@ -57,7 +60,10 @@ const addListeners = (nsId)=>{
         //add the nsId listener to this namespace
         nameSpaceSockets[nsId].on('messageToRoom', (messageObj)=>{
             console.log(messageObj);
-        })
+
+            //add message to DOM
+            document.querySelector('#messages').innerHTML += buildMessageHtml(messageObj);
+        });
         listeners.messageToRoom[nsId] = true;
     }
 }
@@ -143,3 +149,12 @@ socket.on('nsList', (nsData)=>{
 //     console.log('reconnect event!!!')
 //     console.log(data)
 // })
+
+/*
+messageObj structure {
+    newMessage,
+    date,
+    userName,
+    avatar
+}
+*/

@@ -42,11 +42,17 @@ namespaces.forEach((namespace)=>{
     // });
     io.of(namespace.endpoint).on('connection', (socket)=>{
         console.log(`${socket.id} has connected to ${namespace.endpoint}`);
-        //roomTitle passed from joinRoom.js - joinRoom()
+        //roomObj passed from joinRoom.js - joinRoom()
 
         //lesson 40 acknowlege functions - ackCallBack()
-        socket.on('joinRoom', async (roomTitle, ackCallback)=>{
+        socket.on('joinRoom', async (roomObj, ackCallback)=>{
             //need to fetch the history
+            const thisNs = namespaces[roomObj.namespaceId];
+
+            //roomInstance 
+            const thisRoomObj = thisNs.rooms.find(room=> room.roomTitle === roomObj.roomTitle);
+
+            const thisRoomsHistory = thisRoomObj.history;
 
             //leave all rooms, because the client can only be in one room
             const rooms = socket.rooms; //returns a Set()
@@ -62,14 +68,15 @@ namespaces.forEach((namespace)=>{
 
             //join the room
             //NOTE: roomTitle is coming from CLIENT (Not safe) - do auth so user (socket) has right to join room
-            socket.join(roomTitle);
+            socket.join(roomObj.roomTitle);
 
             //fetch the number of sockets in this room
-            const sockets = await io.of(namespace.endpoint).in(roomTitle).fetchSockets();
+            const sockets = await io.of(namespace.endpoint).in(roomObj.roomTitle).fetchSockets();
             const socketCount = sockets.length;
 
             ackCallback({
-                numUsers:socketCount
+                numUsers:socketCount,
+                thisRoomsHistory
             });
         });
 
@@ -84,6 +91,13 @@ namespaces.forEach((namespace)=>{
             //send out this messageObj to everyone including the sender
             io.of(namespace.endpoint).in(currentRoom).emit('messageToRoom', messageObj);
 
+            //add this message to this rooms history
+            const thisNs = namespaces[messageObj.selectedNsId];
+            const thisRoom = thisNs.rooms.find(room=> room.roomTitle === currentRoom);
+            console.log(thisRoom);
+
+            //push message on rooms history[] array
+            thisRoom.addMessage(messageObj);
         });
     });
 });
