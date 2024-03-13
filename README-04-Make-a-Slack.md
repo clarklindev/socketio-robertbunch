@@ -397,3 +397,108 @@ const joinRoom =  async (roomTitle, namespaceId)=>{
     document.querySelector('.curr-room-num-users').innerHTML = `${ackResp.numUsers}<span class="fa-solid fa-user"></span>`;
 }
 ```
+
+### 42. emit messages to room - (steps 7-9 continued)
+- on the slack UI, there is a message input field to send messages to others in room 
+`<form id="message-form"><input id="user-message" type="text"/></form>`
+- need to add submit handler to form
+
+TODO:
+1. need to know the message (from input)
+2. need to know the connected namespace (need the index - so we can emit from that socket)
+3. CLIENT: create a global variable selectedNsId (if possible state management.. to track the selected namespace)
+4. in joinNs() set selectedNsId = clickedNs.id;
+
+5. CLIENT: submit form
+6. SERVER: awaiting for message since it connected...
+
+QUESTION: how can we find out what room this socket is in?
+ANSWER: 
+    - 0 index is sockets personal room
+    - 1 index is ALWAYS what room this socket is in
+7. SERVER: send out this messageObj to everyone including the sender
+8. CLIENT: addListeners job is to manage all listeners added to all namespaces. this prevents listeners being added multiple times
+
+```js
+//CLIENT: client-scripts.js
+const nameSpaceSockets = [];
+let selectedNsId = 0;
+
+//add a submit handler for our form
+document.querySelector('#message-form').addEventListener('submit', (e)=>{
+    //keep the browser from submitting
+    e.preventDefault();
+
+    //get value from input
+    const newMessage = document.querySelector('#user-message').value; //<input id="user-message" type="text" placeholder="Enter your message" />
+    console.log(newMessage, selectedNsId);
+
+    //FROM the namespace emit a message
+    nameSpaceSockets[selectedNsId].emit('newMessageToRoom', {
+        newMessage,
+        date: Date.now(),
+        avatar: 'https://via.placeholder.com/30',
+        userName
+    })
+});
+
+//client addListeners job is to manage all listeners added to all namespaces
+//this prevents listeners being added multiple times
+const addListeners = (nsId)=>{
+    //lesson 42 - emit messages to room
+    if(!listeners.messageToRoom[nsId]){
+        //add the nsId listener to this namespace
+        nameSpaceSockets[nsId].on('messageToRoom', (messageObj)=>{
+            console.log(messageObj);
+        })
+        listeners.messageToRoom[nsId] = true;
+    }
+}
+
+
+//generating rooms externalized to own file "joinNs.js"
+//user clicks on a namespace
+socket.on('nsList', (nsData)=>{
+
+    Array.from(document.getElementsByClassName('namespace')).forEach((element)=>{
+        element.addEventListener('click', ()=>{
+            joinNs(element, nsData);
+        })
+    });
+
+});
+
+```
+
+- set the selectedNsId to the clicked namespace  
+```js
+//joinNs.js
+const joinNs = (element, nsData)=>{
+    const nsEndpoint = element.getAttribute('ns');  //gets ns="" attribute 
+
+    //find the ns (returns Namespace instance) in nsData with endpoint same as the one user clicked on
+    const clickedNs = nsData.find(row=> row.endpoint === nsEndpoint);
+    
+    //global- so we can submit message to the right place
+    selectedNsId = clickedNs.id;
+}
+```
+
+```js
+//SERVER
+socket.on('newMessageToRoom', (messageObj)=>{
+    console.log('messageObj:', messageObj);
+
+    //sever should broadcast to all sockets in this room
+    //how can we find out what room this socket is in?
+        //0 index is sockets personal room
+        //1 index is ALWAYS which room socket is in
+    const rooms = socket.rooms;
+    const currentRoom = [...rooms][1];  //MUST USE spread as rooms is a Set() and has no index, convert to array first.
+
+    //send out this messageObj to everyone including the sender
+    io.of(namespace.endpoint).in(currentRoom).emit('messageToRoom', messageObj);
+});
+```
+### 43. Slack - Sending the history - (Steps 7-9 continued)
+

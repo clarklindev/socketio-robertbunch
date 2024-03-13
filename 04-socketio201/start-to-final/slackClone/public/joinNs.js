@@ -5,6 +5,9 @@ const joinNs = (element, nsData)=>{
 
     //find the ns (returns Namespace instance) in nsData with endpoint same as the one user clicked on
     const clickedNs = nsData.find(row=> row.endpoint === nsEndpoint);
+    
+    //global- so we can submit message to the right place
+    selectedNsId = clickedNs.id;
     const rooms = clickedNs.rooms;
 
     //get room-list div

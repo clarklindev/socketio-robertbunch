@@ -72,5 +72,18 @@ namespaces.forEach((namespace)=>{
                 numUsers:socketCount
             });
         });
+
+        socket.on('newMessageToRoom', (messageObj)=>{
+            console.log('messageObj:', messageObj);
+
+            //broadcast this to all connected clients in room
+            //how can we find out what room this socket is in?
+            const rooms = socket.rooms;
+            const currentRoom = [...rooms][1];
+        
+            //send out this messageObj to everyone including the sender
+            io.of(namespace.endpoint).in(currentRoom).emit('messageToRoom', messageObj);
+
+        });
     });
 });

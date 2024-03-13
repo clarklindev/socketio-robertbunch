@@ -15,10 +15,34 @@ const socket = io('http://localhost:9000');     //available because slack.html <
 const nameSpaceSockets = [];
 //lesson 38 FIX 2: listeners
 const listeners = {
-    nsChange: []
+    nsChange: [],
+    messageToRoom:[],
 }
 
+//a global variable we update when the user updates the namespace 
+//use statemanagement...
+let selectedNsId = 0;
+
+//add a submit handler for our form
+document.querySelector('#message-form').addEventListener('submit', (e)=>{
+    //keep the browser from submitting
+    e.preventDefault();
+
+    //get value from input
+    const newMessage = document.querySelector('#user-message').value;      //<input id="user-message" type="text" placeholder="Enter your message" />
+    console.log(newMessage, selectedNsId);
+
+    nameSpaceSockets[selectedNsId].emit('newMessageToRoom', {
+        newMessage,
+        date: Date.now(),
+        avatar: 'https://via.placeholder.com/30',
+        userName
+    });
+})
+
 //lesson 38 (7min2sec)
+//client addListeners job is to manage all listeners added to all namespaces
+//this prevents listeners being added multiple times
 const addListeners = (nsId)=>{
     if(!listeners.nsChange[nsId]){
         nameSpaceSockets[nsId].on('nsChange', (data)=>{
@@ -27,8 +51,14 @@ const addListeners = (nsId)=>{
         })
         listeners.nsChange[nsId] = true;
     }
-    else{
-        //nothing to do - listeners exist
+
+    //lesson 42 - emit messages to room
+    if(!listeners.messageToRoom[nsId]){
+        //add the nsId listener to this namespace
+        nameSpaceSockets[nsId].on('messageToRoom', (messageObj)=>{
+            console.log(messageObj);
+        })
+        listeners.messageToRoom[nsId] = true;
     }
 }
 
