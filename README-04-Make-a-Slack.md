@@ -616,3 +616,37 @@ namespaces.forEach((namespace)=>{
     });
 });
 ```
+
+### 44 passing query data on connection (basic auth)
+
+- query parameters can be provided - either with the query option or directly in the url eg. `http://localhost/users?token=abc`
+- SERVER: additional query parameters (then found in 'socket.handshake.query' object on server)
+- BUT...this is bad when you put username and password in query
+- FIX: socket options has "auth" since socketio v3.0.0 - purpose -> when credentials are sent when accessing a namespace.
+
+#### CLIENT
+```js
+//example
+const clientOptions = {
+    reconnectionDelayMax: 1000,
+    auth: {
+        token: "123",
+        username,
+        password
+    },
+    query:{
+        "my-key":"my-value",
+        userName, 
+        password
+    }
+}
+
+const socket = io('ws://example.com/my-namespace', clientOptions);
+```
+
+#### SERVER
+```js
+io.on('connection', (socket)=>{
+    console.log(socket.handshake.query);
+})
+```

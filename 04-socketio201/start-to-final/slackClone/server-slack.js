@@ -13,6 +13,10 @@ const expressServer = app.listen(9000); //http traffic
 const io = socketio(expressServer);  //socket tcp traffic gives access to <script src="/socket.io/socket.io.js"></script> in slack.html
 
 io.on('connection', (socket)=>{
+
+    console.log('=============');
+    console.log(socket.handshake);
+
     socket.emit('welcome', 'welcome to the server');
     socket.on('clientConnect', (data)=>{
         console.log(socket.id,"has connected");

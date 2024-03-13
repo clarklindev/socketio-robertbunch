@@ -8,8 +8,20 @@
 const userName = "Rob";
 const password = "x";
 
+const clientOptions = {
+    reconnectionDelayMax: 1000,
+    auth: {
+        token: "123"
+    },
+    query:{
+        "my-key":"my-value",
+        userName, 
+        password
+    }
+}
+
 // always join the main namespace, thats where the client gets the namespaces from
-const socket = io('http://localhost:9000');     //available because slack.html <script src="/socket.io/socket.io.js"></script>
+const socket = io('http://localhost:9000', clientOptions);     //available because slack.html <script src="/socket.io/socket.io.js"></script>
 
 //lesson 38 FIX 1: sockets will be put into this array, in the index of their ns.id
 const nameSpaceSockets = [];
