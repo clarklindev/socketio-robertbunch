@@ -73,3 +73,14 @@ document.querySelector('.name-form').addEventListener('submit', (e)=>{
 });
 ```
 
+# 50. A few UI loose ends
+- after user enters name, choosing game type -> select "play solo": 
+- html: `<button type="button" class="btn play-button start-game"></button>`
+- create public/socketStuff.js
+- create public/canvasStuff.js
+- import in index.html
+
+- attach event listeners to ".start-game"
+- hide the start modal
+- show all ".hiddenOnStart" interface elements by removing class
+
