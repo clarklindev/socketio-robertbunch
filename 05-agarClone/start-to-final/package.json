@@ -1,0 +1,18 @@
+{
+  "name": "start-to-final",
+  "version": "1.0.0",
+  "description": "- games need to be between 30fps (1 frame every 0.033) and 60fps (1 frame every 0.016)\r - in a socketio game - if there are 4 players on screen, this becomes:\r - PER CLIENT: `33 frames per second * 2 (communication both ways) * number of clients` = 66 messages / sec\r - TOTAL = 66 * 4 = 264 message per second",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.3",
+    "nodemon": "^3.1.0",
+    "socket.io": "^4.7.4"
+  }
+}
