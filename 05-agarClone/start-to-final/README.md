@@ -84,3 +84,43 @@ document.querySelector('.name-form').addEventListener('submit', (e)=>{
 - hide the start modal
 - show all ".hiddenOnStart" interface elements by removing class
 
+# 51 - Draw the player
+- NOTE: make the game work on CLIENT without the server first...(easier)
+- draw would happen on `<canvas>`
+- create randomX (position where to start player)
+- we dont draw on canvas, but rather context
+- context.beginPath(); tells canvas we about to start drawing
+- context.arc(x, y, r, sAngle, eAngle, counterclockwise) //[draw circle](https://www.w3schools.com/tags/canvas_arc.asp) 
+- context.fill(); //fill circle
+
+```html
+<canvas id="the-canvas" style="background: url('images/starfield.jpg')">
+    <!-- our drawing will go here -->
+</canvas>
+```
+
+```js
+const draw = ()=>{
+    //draw player 
+    let randomX = Math.floor( (Math.random() * 500) + 10);    //horizontal (10-500)
+    let randomY = Math.floor( (Math.random() * 500) + 10);    //vertical (10-500)
+    const sAngle = 0; 
+    const eAngle = Math.PI * 2;
+
+    context.beginPath();    
+    context.fillStyle = 'rgb(255, 0, 0)';
+    //arg1 (center x) of arc, 
+    //arg2 (center y) of arc
+    //arg3: radius
+    //arg4: start drawing - 0 is the 3oclick position of the arcs circle
+    //arg5: end drawing - ending angle in radians (full circle = 2xMath.PI())
+    context.arc(randomX, randomY, 10, sAngle, eAngle);
+    context.fill(); //fill circle
+    context.lineWidth = 3; //how wide to draw a line
+    context.strokeStyle = 'rgb(0,255,0)';    //draw a green stroke
+    context.stroke(); //draw the line (border)
+
+    //clamp window to player
+    //add mouse listeners to move player towards mouse
+}
+```
