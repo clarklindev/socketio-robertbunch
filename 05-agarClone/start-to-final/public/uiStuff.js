@@ -42,5 +42,5 @@ document.querySelector('.start-game').addEventListener('click', ()=>{
     //show the hiddenOnStart elements
     const elArray = Array.from(document.querySelectorAll('.hiddenOnStart'));
     elArray.forEach(el=> el.removeAttribute('hidden'));
-    init(); //call canvasStuff.js init()
+    init(); //called from socketStuff.js init()
 });

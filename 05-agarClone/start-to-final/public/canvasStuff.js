@@ -1,10 +1,6 @@
 //CLIENT
 //player from uiStuff.js
 
-const init = ()=>{
-    console.log('canvasStuff.js init()');
-    draw();
-}
 
 //-------------------------
 //---------DRAW------------
