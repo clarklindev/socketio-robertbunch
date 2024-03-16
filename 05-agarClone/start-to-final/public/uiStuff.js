@@ -16,6 +16,7 @@ canvas.height = wHeight;
 
 const player = {};  //represent "this.player"
 let orbs = []; //global var for client orbs
+let players = [];   //array of all players
 
 //put modals into variables
 const loginModal = new bootstrap.Modal(document.querySelector('#loginModal'));

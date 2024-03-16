@@ -358,17 +358,50 @@ io.on('connect', (socket)=>{
 
 ```
 
+
+# 58 - step 1 of drawing the players from the server
+### canvas -> drawn things with server data at the correct place
+- CLIENT: uiStuff.js -> we are creating mirror of server data on client -> create players = [] array
+- CLIENT: socketStuff.js -> receiving data from server 'tick' emitted
+    -> assign players from uiStuff this value
+- CLIENT: canvasStuff.js -> draw all the players on canvas
+    - use serverData (p.playerData.locX, p.playerData.locY) instead of (player.locX, player.locY)
+
+### PROBLEMS!!!
+- up to this point, camera -> is not moving with the player anymore (camera still using mouse movement positions and not server data)
+- up to this point, player -> we using server info now, but its not getting updated..
+TODO: the positions are happening on client and that needs to be sent to server, which then knows where client is, 
+
+```js
+//CLIENT
+//uiStuff.js
+//...
+let players = [];   //array of all players
+
+```
+
 ```js
 //CLIENT
 //public/socketStuff.js
-
-socket.on('tick', (players)=>{
-    console.log('players:', players);
+socket.on('tick', (playersArray)=>{
+    players = playersArray;
 });
 
+```
+
+```js
+//CLIENT
+//public/canvasStuff.js
+
+// player.locX = Math.floor( (Math.random() * 500) + 10);    //horizontal
+// player.locY = Math.floor( (Math.random() * 500) + 10);    //vertical
+players.forEach(p=>{
+    //...
+    context.fillStyle = p.playerData.color;
+    // context.arc(player.locX, player.locY, player.radius, sAngle, eAngle);
+    context.arc(p.playerData.locX, p.playerData.locY, p.playerData.radius, sAngle, eAngle);
+});
 
 ```
 
 ### data from client to server
-### canvas drawn with server data
-
