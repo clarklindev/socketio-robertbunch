@@ -14,4 +14,8 @@ const init = async ()=>{
     draw();
 }
 
+socket.on('tick', (players)=>{
+    console.log('players:', players);
+});
+
 

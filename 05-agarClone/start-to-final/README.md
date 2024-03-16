@@ -313,3 +313,62 @@ io.on('connect', (socket)=>{
     });
 });
 ```
+
+# 56 refactoring init for performance
+- see commit 
+
+# 57 send-player-data-from-the-server-to-the-clients-and-visa-versa
+### data from server to all clients
+    - SERVER:issue an event to every connected socket
+    - 30 times a sec (30fps)
+    - add socket to "game" room
+    - setInterval every 33 milliseconds (1000/30) -> SERVER: send event to "game" room 
+        `io.to('game').emit('tick', players);`
+    - client receives "tick" emitted from server.
+    
+```js
+//SERVER
+//socketStuff/socketMain.js
+
+let tickTockInterval;
+
+io.on('connect', (socket)=>{
+    //a socket has connected
+    socket.on('init', (playerObj, ackCallback)=>{
+        
+        //someone is about to be added to players...
+        if(players.length === 0){
+            tickTockInterval = setInterval(()=>{
+                io.to('game').emit('tick', players); //send the event to the 'game' room
+            }, 33); //1000/30 === 33.3333
+        }
+
+        socket.join('game');    //add this socket to "game" room
+
+        //...
+    });
+
+    socket.on('disconnect', ()=>{
+        //check to see if players is empty.. if so, stop ticking...
+        if(players.length === 0){
+            clearInterval(tickTockInterval);
+        }
+    })
+});
+
+```
+
+```js
+//CLIENT
+//public/socketStuff.js
+
+socket.on('tick', (players)=>{
+    console.log('players:', players);
+});
+
+
+```
+
+### data from client to server
+### canvas drawn with server data
+

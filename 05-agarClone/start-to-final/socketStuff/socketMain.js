@@ -25,14 +25,27 @@ const settings = {
 };
 
 const players = [];
+let tickTockInterval;
 
 //on server start, generate initial orbs
 //every time one is absorbed, server will make a new one
 initGame(); 
 
+
+
 io.on('connect', (socket)=>{
     //a socket has connected
     socket.on('init', (playerObj, ackCallback)=>{
+        
+        //someone is about to be added to players...
+        if(players.length === 0){
+            tickTockInterval = setInterval(()=>{
+                io.to('game').emit('tick', players); //send the event to the 'game' room
+            }, 33); //1000/30 === 33.3333
+        }
+
+        socket.join('game');    //add this socket to "game" room
+
         const playerName = playerObj.playerName;
         //make a PlayerConfig object - Player specific data - only player needs to know
         const playerConfig = new PlayerConfig(settings);
@@ -44,6 +57,13 @@ io.on('connect', (socket)=>{
         
         ackCallback(orbs); //send orbs array back as an acknowledgement function
     });
+
+    socket.on('disconnect', ()=>{
+        //check to see if players is empty.. if so, stop ticking...
+        if(players.length === 0){
+            clearInterval(tickTockInterval);
+        }
+    })
     
 });
 
