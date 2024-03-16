@@ -58,6 +58,29 @@ io.on('connect', (socket)=>{
         ackCallback(orbs); //send orbs array back as an acknowledgement function
     });
 
+    //"tock" from client (as in tik-tok)
+    socket.on('tock', (data)=>{
+        speed = player.playerConfig.speed;
+        const xV = player.playerConfig.xVector = data.xVector;   //vector from player to mouse
+        const yV = player.playerConfig.yVector = data.yVector;   //vector from player to mouse
+    
+        //OUT OF BOUNDS: restrict on X -> allow only Y
+        if((player.playerData.locX < 5 && xV < 0) || (player.playerData.locX > 500) && (xV > 0)){
+            player.playerData.locY -= speed * yV;
+        }
+        
+        //OUT OF BOUNDS: restrict on Y -> allow only X
+        else if((player.playerData.locY < 5 && yV > 0) || (player.playerData.locY > 500) && (yV < 0)){
+            player.playerData.locX += speed * xV;
+        }
+        
+        //move normally
+        else{
+            player.playerData.locX += speed * xV;
+            player.playerData.locY -= speed * yV;
+        }    
+    });
+
     socket.on('disconnect', ()=>{
         //check to see if players is empty.. if so, stop ticking...
         if(players.length === 0){

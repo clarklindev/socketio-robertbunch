@@ -400,8 +400,143 @@ players.forEach(p=>{
     context.fillStyle = p.playerData.color;
     // context.arc(player.locX, player.locY, player.radius, sAngle, eAngle);
     context.arc(p.playerData.locX, p.playerData.locY, p.playerData.radius, sAngle, eAngle);
+    //...
 });
 
 ```
 
+# 59 - sending player direction from client to server
 ### data from client to server
+- send mouse position  CLIENT -> SERVER
+- SERVER: updates DATA -> sends back to CLIENT
+- client can then draw player at correct position
+
+- socketMain.js
+    - remove const and move `const player` declaration outside `socket.on('init',()=>{});` as `let player={};`
+    - this allows `socket.on('tock', (data)=>{});` access to player object.
+    - set `speed = 10;` to `speed=player.playerConfig.speed;`
+
+
+```js
+//CLIENT
+//public/uiStuff.js
+const player = {};
+```
+
+```js
+//CLIENT
+//public/canvasStuff.js
+canvas.addEventListener('mousemove',(event)=>{
+//...
+
+    //THIS CODE WILL MOVE FROM CLIENT TO SERVER //socket.on('tock', ()=>{})
+    // speed = 10;
+    // xV = xVector;   //vector from player to mouse
+    // yV = yVector;   //vector from player to mouse
+
+    // //OUT OF BOUNDS: restrict on X -> allow only Y
+    // if((player.locX < 5 && xV < 0) || (player.locX > 500) && (xV > 0)){
+    //     player.locY -= speed * yV;
+    // }
+    
+    // //OUT OF BOUNDS: restrict on Y -> allow only X
+    // else if((player.locY < 5 && yV > 0) || (player.locY > 500) && (yV < 0)){
+    //     player.locX += speed * xV;
+    // }
+    
+    // //move normally
+    // else{
+    //     player.locX += speed * xV;
+    //     player.locY -= speed * yV;
+    // }    
+
+    player.xVector = xVector;
+    player.yVector = yVector;
+});
+```
+
+```js
+//CLIENT
+//public/socketStuff.js
+const init = async ()=>{
+    setInterval(()=>{
+        socket.emit('tock', {
+            xVector: player.xVector,
+            yVector: player.yVector
+        });
+    }, 33);     //every 33 milliseconds
+}
+```
+
+```js
+//SERVER
+//socketStuff/socketMain.js
+
+io.on('connect', (socket)=>{
+
+    let player={};
+
+    //a socket has connected
+    socket.on('init', (playerObj, ackCallback)=>{
+        
+        //someone is about to be added to players...
+        if(players.length === 0){
+            tickTockInterval = setInterval(()=>{
+                io.to('game').emit('tick', players); //send the event to the 'game' room
+            }, 33); //1000/30 === 33.3333
+        }
+
+        socket.join('game');    //add this socket to "game" room
+
+        const playerName = playerObj.playerName;
+        //make a PlayerConfig object - Player specific data - only player needs to know
+        const playerConfig = new PlayerConfig(settings);
+        //make a PlayerData object - the data specific to this Player - everyone needs to know
+        const playerData = new PlayerData(playerName, settings);
+        //Master Player object    
+        player = new Player(socket.id, playerConfig, playerData);
+        players.push(player);
+        
+        ackCallback(orbs); //send orbs array back as an acknowledgement function
+    });
+
+    socket.on('tock', (data)=>{
+        speed = player.playerConfig.speed;
+        const xV = player.playerConfig.xVector = data.xVector;   //vector from player to mouse
+        const yV = player.playerConfig.yVector = data.yVector;   //vector from player to mouse
+
+        //OUT OF BOUNDS: restrict on X -> allow only Y
+        if((player.locX < 5 && xV < 0) || (player.locX > 500) && (xV > 0)){
+            player.locY -= speed * yV;
+        }
+        
+        //OUT OF BOUNDS: restrict on Y -> allow only X
+        else if((player.locY < 5 && yV > 0) || (player.locY > 500) && (yV < 0)){
+            player.locX += speed * xV;
+        }
+        
+        //move normally
+        else{
+            player.locX += speed * xV;
+            player.locY -= speed * yV;
+        }    
+    });
+});
+```
+
+```js
+//SERVER
+//public/socketStuff/classes/PlayerConfig.js
+
+//data that no other player needs to know about - specific data for this player
+class PlayerConfig{
+    constructor(settings){
+        this.xVector = 0;   //where mouse is relative to player
+        this.yVector = 0;   //where mouse is relative to player
+        this.speed = settings.defaultSpeed;
+        this.zoom = settings.defaultZoom;
+    }
+}
+
+module.exports = PlayerConfig;
+```

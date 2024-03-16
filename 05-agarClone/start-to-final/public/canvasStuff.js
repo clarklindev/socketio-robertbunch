@@ -95,23 +95,6 @@ canvas.addEventListener('mousemove',(event)=>{
         console.log('mouse is TOP RIGHT of player');
     }
 
-    speed = 10;
-    xV = xVector;   //vector from player to mouse
-    yV = yVector;   //vector from player to mouse
-
-    //OUT OF BOUNDS: restrict on X -> allow only Y
-    if((player.locX < 5 && xV < 0) || (player.locX > 500) && (xV > 0)){
-        player.locY -= speed * yV;
-    }
-    
-    //OUT OF BOUNDS: restrict on Y -> allow only X
-    else if((player.locY < 5 && yV > 0) || (player.locY > 500) && (yV < 0)){
-        player.locX += speed * xV;
-    }
-    
-    //move normally
-    else{
-        player.locX += speed * xV;
-        player.locY -= speed * yV;
-    }    
+    player.xVector = xVector;
+    player.yVector = yVector;
 })
