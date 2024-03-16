@@ -19,6 +19,9 @@ SERVER JOB
 - figure out where the items on stage are
 
 # 48. Socketio app organization
+- EVERYTHING in public/ is client side
+- EVERYTHING regarding sockets (socketStuff) /express (expressStuff) is server side 
+
 - index.js - this is the file we will run with node  
 - server.js - where the servers are created - create our servers and export them (socketio and express server)  
 - expressStuff/expressMain.js - purpose is to be an entrypoint for all express stuff  
@@ -174,4 +177,89 @@ canvas.addEventListener('mousemove',(event)=>{
 
     requestAnimationFrame(draw);
 });
+```
+
+### 53 - get and draw game orbs (non-player)
+- orbs are created by server, hosted on server
+- /socketStuff/classes/Orb.js   - instance has color, x,y, radius
+- /socketStuff/socketMain.js
+- create orbs, everytime socket connects to server, it should send back all orbs `emit('init', orbs)`
+- in client -> uiStuff.js create orbs array
+- client socket is listening for feedback on 'init' from server, when that happens,
+
+#### RECAP
+- CREATION PHASE
+    1. SERVER creates orbs
+    2. client connects
+    3. SERVER -> send back data: emit('init', {orbs})
+    4. CLIENT ensure html has script with socket io: `<script src="/socket.io/socket.io.js"></script>` <!-- gives scripts.js access to io-->
+    5. CLIENT -> socketStuff.js -> connect to socket server `const socket = io.connect('http://localhost:9000')`
+    6. CLIENT -> socketStuff.js -> socket listen for "init" 
+    7. CLIENT -> uiStuff.js -> `let orbs = [];` //global var for client orbs
+    8. CLIENT -> socketStuff.js -> assign the data from 'init' event to orbs
+    9. CLIENT -> canvasStuff.js -> inside draw() -> draw orbs 
+
+- GAME PHASE
+    10. CLIENT -> uiStuff.js -> everyone waits for player to click on start game -> initiates "start game"
+
+
+```js
+//CLIENT
+//public/uiStuff.js
+const orbs = [];
+
+```
+
+```js
+//SERVER
+//socketStuff/classes/Orb.js
+class Orb{
+    constructor(){
+        this.color = this.getRandomColor();
+        this.locX = Math.floor(Math.random() * 500);
+        this.locY = Math.floor(Math.random() * 500);
+        this.radius = 5;
+    }
+
+    getRandomColor(){
+        const r = Math.floor((Math.random() * 200) + 50);
+        const g = Math.floor((Math.random() * 200) + 50);
+        const b = Math.floor((Math.random() * 200) + 50);
+
+        //rgb(r,g,b);
+        return `rgb(${r}, ${g}, ${b})`;
+    }
+
+}
+
+module.exports = Orb;
+
+```
+
+```js
+//SERVER
+//socketStuff/socketMain.js
+//purpose of socketMain.js -> entrypoint for all socket.io stuff
+const io = require('../servers').io;
+const Orb = require('./classes/Orb');
+
+//make an orbs array that will host all 500-5000 non-player orbs
+const orbs = [];
+
+//on server start, generate initial orbs
+//every time one is absorbed, server will make a new one
+initGame();
+
+io.on('connect', (socket)=>{
+    socket.emit('init', {orbs});
+});
+
+function initGame(){
+    //loop 500 times, push orb on array
+    for(let i = 0; i < 500; i++){
+        orbs.push(new Orb());
+    }
+}
+
+module.exports = io;
 ```

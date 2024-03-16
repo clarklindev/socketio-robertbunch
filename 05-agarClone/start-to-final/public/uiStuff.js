@@ -1,3 +1,5 @@
+//CLIENT
+
 //create width/height variables to equal window
 let wWidth = window.innerWidth;
 let wHeight = window.innerHeight;
@@ -13,6 +15,7 @@ canvas.width = wWidth;
 canvas.height = wHeight;
 
 const player = {};  //represent "this.player"
+let orbs = []; //global var for client orbs
 
 //put modals into variables
 const loginModal = new bootstrap.Modal(document.querySelector('#loginModal'));

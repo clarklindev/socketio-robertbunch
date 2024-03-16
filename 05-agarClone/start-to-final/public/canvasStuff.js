@@ -1,3 +1,4 @@
+//CLIENT
 //player from uiStuff.js
 
 const init = ()=>{
@@ -13,8 +14,6 @@ player.locY = Math.floor( (Math.random() * 500) + 10);    //vertical
 
 //player.locX and player.locY is the only dynamic values, everything else remains same
 const draw = ()=>{
-    //clear context
-    context.clearRect(0,0, canvas.width, canvas.height);
 
     //reset context translate to default
     //parameter 1 - horizontal scale
@@ -24,6 +23,9 @@ const draw = ()=>{
     //parameter 5 - horizontal translate
     //parameter 6 - vertical translate
     context.setTransform(1,0,0,1,0,0);
+
+    //clear context
+    context.clearRect(0,0, canvas.width, canvas.height);
 
     //clamp the screen / viewport (vp) to the players location
     const camX = -player.locX + canvas.width/2;
@@ -43,13 +45,18 @@ const draw = ()=>{
     //arg5: end drawing - ending angle in radians (full circle = 2xMath.PI())
     context.arc(player.locX, player.locY, 10, sAngle, eAngle);
     
-    //draw an arc
-    context.arc(200,200, 10, sAngle, eAngle);
-    
     context.fill(); //fill circle
     context.lineWidth = 3; //how wide to draw a line
     context.strokeStyle = 'rgb(0,255,0)';    //draw a green stroke
     context.stroke(); //draw the line (border)
+
+    //draw orbs 
+    orbs.forEach((orb)=>{
+        context.beginPath(); //starts new path
+        context.fillStyle = orb.color;
+        context.arc(orb.locX, orb.locY, orb.radius, 0, Math.PI * 2);
+        context.fill();
+    });
 
     //requestAnimationFrame is like a controlled loop (recursive at every paint/frame)
     //if fps is 35, it will call draw 35 times/sec
