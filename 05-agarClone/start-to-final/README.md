@@ -283,3 +283,33 @@ module.exports = io;
                 - xV
                 - yV
                 - zoom
+                - speed
+
+# 55 Player Classes
+- create classes: Player, PlayerConfig, PlayerData
+- import in socketMain.js
+- create instances
+
+```js
+//socketStuff/socketMain.js
+const Player = require('./classes/Player');
+const PlayerConfig = require('./classes/PlayerConfig');
+const PlayerData = require('./classes/PlayerData');
+const Orb = require('./classes/Orb');
+
+//on connect
+io.on('connect', (socket)=>{
+    //a socket has connected
+    const playerName = "temp";
+    //make a PlayerConfig object - Player specific data - only player needs to know
+    const playerConfig = new PlayerConfig(settings);
+    //make a PlayerData object - the data specific to this Player - everyone needs to know
+    const playerData = new PlayerData(playerName, settings);
+    //Master Player object    
+    const player = new Player(socket.id, playerConfig, playerData);
+
+    socket.emit('init', {
+        orbs
+    });
+});
+```
