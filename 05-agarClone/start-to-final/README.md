@@ -263,3 +263,23 @@ function initGame(){
 
 module.exports = io;
 ```
+
+# 54 - whiteboarding player classes, what does server send?
+- collision detection needs to happen on server
+- 3 classes 
+    - Server stores Player (Player.js)
+
+            - socket id
+
+            - {} PlayerData.js (WHAT-EVERYBODY-NEEDS-TO-RECEIVE-THIS-DATA-IS-DATA-ABOUT-EVERYBODY-ELSE)
+                - color
+                - names
+                - locX (related to PlayerConfig xV)
+                - locY (related to PlayerConfig yV)
+                - radius
+                - score
+
+            - {} PlayerConfig.js (SERVER-NEEDS-TO-KNOW-THIS-ABOUT-EACH-INDIVIDUAL-CLIENT-BUT-NOBODY-NEEDS-TO-KNOW)
+                - xV
+                - yV
+                - zoom
