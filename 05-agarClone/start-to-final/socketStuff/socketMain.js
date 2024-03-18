@@ -24,7 +24,8 @@ const settings = {
     worldHeight: 500
 };
 
-const players = [];
+const players = [];         //server use only
+const playersForUsers = [];     //player data
 let tickTockInterval;
 
 //on server start, generate initial orbs
@@ -35,12 +36,14 @@ initGame();
 
 io.on('connect', (socket)=>{
     //a socket has connected
+    let player={};
+
     socket.on('init', (playerObj, ackCallback)=>{
         
         //someone is about to be added to players...
         if(players.length === 0){
             tickTockInterval = setInterval(()=>{
-                io.to('game').emit('tick', players); //send the event to the 'game' room
+                io.to('game').emit('tick', playersForUsers); //send the event to the 'game' room
             }, 33); //1000/30 === 33.3333
         }
 
@@ -52,14 +55,21 @@ io.on('connect', (socket)=>{
         //make a PlayerData object - the data specific to this Player - everyone needs to know
         const playerData = new PlayerData(playerName, settings);
         //Master Player object    
-        const player = new Player(socket.id, playerConfig, playerData);
-        players.push(player);
-        
-        ackCallback(orbs); //send orbs array back as an acknowledgement function
+        player = new Player(socket.id, playerConfig, playerData);
+        players.push(player);   //server use ONLY
+        playersForUsers.push({playerData});
+        ackCallback({orbs, indexInPlayers:playersForUsers.length - 1}); //send orbs array back as an acknowledgement function
     });
 
     //"tock" from client (as in tik-tok)
     socket.on('tock', (data)=>{
+
+        // a tock has been received before the player is setup.
+        //this is because client "tock" from setTimeout after disconnect
+        if(!player.playerConfig){
+            return;
+        }
+        
         speed = player.playerConfig.speed;
         const xV = player.playerConfig.xVector = data.xVector;   //vector from player to mouse
         const yV = player.playerConfig.yVector = data.yVector;   //vector from player to mouse

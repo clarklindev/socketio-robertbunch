@@ -416,7 +416,78 @@ players.forEach(p=>{
     - this allows `socket.on('tock', (data)=>{});` access to player object.
     - set `speed = 10;` to `speed=player.playerConfig.speed;`
 
+# 60 - clamping the camera - and - cleanup
+- socketMain.js -> socketio connect() has reconnect feature. 
+    NB: when server disconnects, socketMain() will auto-reconnect 
+- socketStuff.js -> has a setInterval() which emits "tock" and continues to run when client gets disconnected.
+- a tock is still emitted, socketMain() still listening for "tock" before the player (eg. player.playerConfig)  is setup. 
 
+- TODO: canvasStuff.js move `socket.on('tock', (data)=>{}` from within the mousemove event listener   to socketMain.js..
+
+- TODO: socketMain.js a tock has been received before the player is setup. this is because client "tock" from setTimeout after disconnect 
+- FIX: add `if(!player.config){}` guard
+
+- FIX: socketStuff.js -> add ternarary defaults
+```js
+ socket.emit('tock', {
+    xVector: player.xVector ? player.xVector : .1,
+    yVector: player.yVector ? player.yVector : .1,
+});
+```
+- FIX: canvasStuff.js -> add ternarary defaults
+```js
+    player.xVector = xVector ? xVector : .1;
+    player.yVector = yVector ? yVector : .1;
+```
+
+### fixing player position (7min 51sec)
+CLIENT: socketStuff.js -> tock() sends x,y to server, 
+
+- canvasStuff -> player position should come from server not canvasStuff: player.locX , player.locY
+    - tick() players but we dont know each players' index so we dont know what to clamp to.
+
+### (8min 50sec) socketMain() - playersForUsers[] array (prevents playerConfig and socketId from being sent out to everybody)
+    - adjust with adding playersForUsers = [] array, and add playerData to that... `playersForUsers.push({playerData});`
+    - we still want to maintain the players[] array (will be for server use only)
+    - socketMain.js tick should update to emit playersForUsers:  `io.to('game').emit('tick', playersForUsers)`
+    - this prevents playerConfig and socketId from being sent out to everybody
+
+### Anti-pattern (DO NOT DO..) (9min 57sec -> 12min 28sec)
+socketStuff.js - setting up with an emitWithAck() assigned to const "myLoc" (see below) wont work 
+- settings user player x and y; you cant set it on "tock" (see below) because you dont know if the order events received will be correct as its async callback function result.
+
+```js
+//NOT GOOD IDEA - update socket.emit to socket.emitWithAck()
+//CLIENT -> socketStuff.js
+setInterval(async ()=>{
+    const myLoc = await socket.emitWithAck('tock', {
+        xVector://...
+        yVector://...
+    });
+    player.locX = myLoc.locX;
+    player.locY = myLoc.locY;
+});
+
+```
+socketMain.js - runs the ackCallback() 
+- and call the callback ackCallback() on server which return x,y value to client 
+```js
+//SERVER -> socketMain.js
+socket.on('tock', (data, ackCallback)=>{
+    //...
+    ackCallback({
+        locX: player.playerData.locX,
+        locY: player.playerData.locY,
+    });
+});
+```
+
+### SOLUTION: let client know where they are from data in client array (playersForUsers)
+- socketMain -> socket.on('init') -> after joining game, and sending back orbs `ackCallback(orbs, )`,
+    send indexInPlayers: `ackCallback({orbs, indexInPlayers:playersForUsers.length - 1})`
+- socketStuff -> change the receiving as an object "initOrbs" becomes "initData"
+    - now to ensure each player knows their own index, player.indexInPlayers = initData.indexInPlayers;
+    
 ```js
 //CLIENT
 //public/uiStuff.js
@@ -426,7 +497,20 @@ const player = {};
 ```js
 //CLIENT
 //public/canvasStuff.js
+
+//DO NOT USE THIS...
+// player.locX = Math.floor( (Math.random() * 500) + 10);    //horizontal
+// player.locY = Math.floor( (Math.random() * 500) + 10);    //vertical
+
+const draw = ()=>{
+    // const camX = -player.locX + canvas.width/2; 
+    // const camY = -player.locY + canvas.height/2;
+    const camX = ;
+    const camY = ;
+};
+
 canvas.addEventListener('mousemove',(event)=>{
+    
 //...
 
     //THIS CODE WILL MOVE FROM CLIENT TO SERVER //socket.on('tock', ()=>{})
@@ -450,8 +534,8 @@ canvas.addEventListener('mousemove',(event)=>{
     //     player.locY -= speed * yV;
     // }    
 
-    player.xVector = xVector;
-    player.yVector = yVector;
+    player.xVector = xVector ? xVector : .1;
+    player.yVector = yVector ? yVector : .1;
 });
 ```
 
@@ -461,8 +545,8 @@ canvas.addEventListener('mousemove',(event)=>{
 const init = async ()=>{
     setInterval(()=>{
         socket.emit('tock', {
-            xVector: player.xVector,
-            yVector: player.yVector
+            xVector: player.xVector ? player.xVector : .1,
+            yVector: player.yVector ? player.yVector : .1,
         });
     }, 33);     //every 33 milliseconds
 }
@@ -497,10 +581,16 @@ io.on('connect', (socket)=>{
         player = new Player(socket.id, playerConfig, playerData);
         players.push(player);
         
-        ackCallback(orbs); //send orbs array back as an acknowledgement function
+        ackCallback({orbs, indexInPlayers:playersForUsers.length - 1}); //send obj back as an acknowledgement function
     });
 
     socket.on('tock', (data)=>{
+
+        // a tock has been received before the player is setup.
+        //this is because client "tock" from setTimeout after disconnect
+        if(!player.config){
+            return;
+        }
         speed = player.playerConfig.speed;
         const xV = player.playerConfig.xVector = data.xVector;   //vector from player to mouse
         const yV = player.playerConfig.yVector = data.yVector;   //vector from player to mouse

@@ -5,8 +5,9 @@
 //-------------------------
 //---------DRAW------------
 //-------------------------
-player.locX = Math.floor( (Math.random() * 500) + 10);    //horizontal
-player.locY = Math.floor( (Math.random() * 500) + 10);    //vertical
+//NOT USED
+// player.locX = Math.floor( (Math.random() * 500) + 10);    //horizontal
+// player.locY = Math.floor( (Math.random() * 500) + 10);    //vertical
 
 //player.locX and player.locY is the only dynamic values, everything else remains same
 const draw = ()=>{
@@ -26,6 +27,7 @@ const draw = ()=>{
     //clamp the screen / viewport (vp) to the players location
     const camX = -player.locX + canvas.width/2;
     const camY = -player.locY + canvas.height/2;
+
     context.translate(camX, camY);
 
     //draw player
@@ -95,6 +97,6 @@ canvas.addEventListener('mousemove',(event)=>{
         console.log('mouse is TOP RIGHT of player');
     }
 
-    player.xVector = xVector;
-    player.yVector = yVector;
+    player.xVector = xVector ? xVector : .1;
+    player.yVector = yVector ? yVector : .1;
 })
