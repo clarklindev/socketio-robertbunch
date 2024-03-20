@@ -19,13 +19,13 @@ const orbs = [];
 
 //settings
 const settings = {
-    defaultNumberOfOrbs: 500,   //number of orbs on map
+    defaultNumberOfOrbs: 5000,   //number of orbs on map
     defaultGenericOrbSize: 5, //smaller than player size
     defaultSpeed: 6,        //player speed
     defaultSize: 6,         //player size
     defaultZoom: 1.5,        //as player gets bigger, zoom out
-    worldWidth: 500,
-    worldHeight: 500
+    worldWidth: 5000,
+    worldHeight: 5000
 };
 
 const players = [];         //server use only

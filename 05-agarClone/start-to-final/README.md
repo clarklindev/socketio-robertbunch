@@ -705,3 +705,23 @@ if(absorbData){
 }
 
 ```
+
+# 64 Disconnect 
+- loop through players and find the player with this players socketId and splice the player (itself) out
+
+```js
+//socketMain.js
+
+let player = {};
+
+socket.on('disconnect', (reason)=>{
+    for(let i = 0; i < players.length; i++){
+        if(players[i].socketId === player.socketId){
+            //splice the player out of players AND playersForUsers
+            players.splice(i,1,{});
+            playersForUsers.splce(i,1,{});
+            break;
+        }
+    }
+}); 
+```
