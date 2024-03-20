@@ -36,6 +36,11 @@ const draw = ()=>{
 
     //draw all the players
     players.forEach((p)=>{
+        if(!p.playerData){
+            //if the playerData does not exist, this is an absorbed player and we dont draw
+            return;
+        }
+
         context.beginPath();    
         context.fillStyle = p.playerData.color;
         //arg1 (center x) of arc, 

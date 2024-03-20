@@ -503,10 +503,8 @@ const player = {};
 // player.locY = Math.floor( (Math.random() * 500) + 10);    //vertical
 
 const draw = ()=>{
-    // const camX = -player.locX + canvas.width/2; 
-    // const camY = -player.locY + canvas.height/2;
-    const camX = ;
-    const camY = ;
+    const camX = -player.locX + canvas.width/2; 
+    const camY = -player.locY + canvas.height/2;
 };
 
 canvas.addEventListener('mousemove',(event)=>{
@@ -543,12 +541,20 @@ canvas.addEventListener('mousemove',(event)=>{
 //CLIENT
 //public/socketStuff.js
 const init = async ()=>{
+    const initData = await socket.emitWithAck('init', {
+        playerName: player.name
+    });
+
     setInterval(()=>{
         socket.emit('tock', {
             xVector: player.xVector ? player.xVector : .1,
             yVector: player.yVector ? player.yVector : .1,
         });
     }, 33);     //every 33 milliseconds
+
+    orbs = initData.orbs;       //see what socketMain.js is sending...SERVER: socket.emit('init', {orbs, initInPlayers});
+    player.indexInPlayers = initData.indexInPlayers;
+    draw();
 }
 ```
 
@@ -629,4 +635,47 @@ class PlayerConfig{
 }
 
 module.exports = PlayerConfig;
+```
+
+---
+
+# 61 - check collisions (math) 
+- add to PLayersData.js
+
+```js
+//constructor
+class PlayerData{
+    constructor(playerName, settings){
+        //...
+        this.playersAbsorbed = 0;
+    }
+}
+```
+
+# 62 - check collisions (code)
+- after removing old orb (collision), need to replace
+- add a new Orb
+- emit to all sockets playing the game, the orbSwitch event so that it can update orbs...(just the new orb)
+
+### checkForOrbCollisions
+- its more math intensive to check if orbs overlap so solution is to first check if squares overlap (AABB test) then check orbs
+- first do AABB (axis align bounding boxes) test - square collision test
+- then do circle overlap check (pythagoras test (Circle))
+
+### checkForPlayerCollisions
+- playerId prop is so that you dont have to check for collisions with itself...
+- then get pLocX, pLocY, pR
+- AABBTest (square)
+- Pythogoras test (circle)
+- if player who "tocked" is bigger, then other person is absorbed.
+- remove player from server players array: `players.splice(i, 1)`
+- remove player from players array used by clients: `playersForUsers.splice(i, 1)`
+- return collisionData
+
+```js
+//socketMain.js
+//import collisions
+const checkForOrbCollisions = require('./checkCollisions').checkForOrbCollisions;
+const checkForPlayerCollisions = require('./checkCollisions').checkForPlayerCollisions;
+
 ```
