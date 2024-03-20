@@ -679,3 +679,29 @@ const checkForOrbCollisions = require('./checkCollisions').checkForOrbCollisions
 const checkForPlayerCollisions = require('./checkCollisions').checkForPlayerCollisions;
 
 ```
+
+# 63 Leaderboard (at 3min 52sec)
+- updating leaderboard will happen inside a sockets 'tock' when score update because of
+    1. confirmed orb collision
+    2. confirmed player collision
+- we only want to update client when necessary (NOT every tick)
+- add a new event..
+
+```js
+//socketMain.js
+//...
+
+//orb collision
+if(capturedOrbI !== null){
+    //...
+    //emit to all playing game because someone just scored
+    io.to('game').emit('updateLeaderBoard', getLeaderBoard());
+}
+
+//player collision
+if(absorbData){
+    //...
+    io.to('game').emit('updateLeaderBoard', getLeaderBoard());
+}
+
+```

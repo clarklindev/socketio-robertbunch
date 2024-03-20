@@ -41,4 +41,26 @@ socket.on('playerAbsorbed', (absorbedData)=>{
     console.log('===================');
     console.log('player who was absorbed:', absorbedData.absorbed);
     console.log('player who absorbed another player:', absorbedData.absorbedBy);
+
+    document.querySelector('#game-message').innerHTML = `${absorbedData.absorbed} was absorbed by ${absorbedData.absorbedBy}`;
+    document.querySelector('#game-message').style.opacity = 1;
+    window.setTimeout(()=>{
+        document.querySelector('#game-message').style.opacity = 0;
+    }, 2000);
 });
+
+socket.on('updateLeaderBoard', (leaderBoardArray)=>{
+    leaderBoardArray.sort((a,b)=>{
+        return b.score - a.score;       //order..
+    });
+    document.querySelector('.leader-board').innerHTML = "";
+
+    //p for 'player'
+    leaderBoardArray.forEach(p=>{
+        if(!p.name){
+            return;
+        }
+        document.querySelector('.leader-board').innerHTML += `<li class="leaderboard-player">${p.name} - ${p.score}</li>`;
+    })
+
+})
