@@ -176,6 +176,136 @@ else{
 //socketMain.js
 ```
 
+### 72 - using cluster module AND Cluster adapter (https://socket.io/docs/v4/cluster-adapter/)
+- https://socket.io/docs/v4/cluster-adapter/
+- The Cluster adapter allows us to use Socket.IO within a Node.js cluster.
+- allows "primary" to communicate with all workers, then works communicate with client
+- server.js - code direct from https://socket.io/docs/v4/cluster-adapter/ usage example...
+- @socket.io/sticky - allows client to make its way back to correct worker
+- @socket.io/cluster-adapter - allows primary node to emit to everyone
+- specific code to use socket server with cluster module
+```js
+//----------------------------------------------------------
+//SPECIFIC CODE TO USE SOCKET SERVER WITH CLUSTER MODULE
+  const httpServer = http.createServer();
+
+  // setup sticky sessions
+  setupMaster(httpServer, {
+    loadBalancingMethod: "least-connection",
+  });
+
+  // setup connections between the workers
+  setupPrimary();
+
+
+//OPTIONAL - for packets that use raw data ------------------------------------------------------
+  // needed for packets containing buffers (you can ignore it if you only send plaintext objects)
+  // Node.js < 16.0.0
+//   cluster.setupMaster({
+//     serialization: "advanced",
+//   });
+  // Node.js > 16.0.0
+//   cluster.setupPrimary({
+//     serialization: "advanced",
+//   });
+//------------------------------------------------------------------------------------------------
+
+  httpServer.listen(3000);
+  //------------------------------------------------------
+```
+- change from default adapter `io.adapter(createAdapter());`
+- `setupWorker(io);` setup connection with the primary process - other side to master -> setupMaster(httpServer, {})
+- PROGRESS: 
+    #### PRIMARY
+    - worked through cluster.
+        `if(cluster.isMaster)/else`
+    - sticky related stuff
+        ```js
+        setupMaster(httpServer, {
+            loadBalancingMethod: "least-connection",
+        });
+        ```
+    - adapter stuff (not required if not using packets that buffer)
+    - cluster module forking
+    ```js
+        //...
+        cluster.fork();
+    ```
+    #### WORKER LEVEL CODE
+    ```
+    else{}
+    ```
+
+- We just need a client to connect to our server (REACT UI)
+
+### FULL EXAMPLE
+```js
+//server.js (similar to clusterTest.js)
+//example using cluster adapter
+const cluster = require("cluster");//makes it so we can use multiple threads
+const http = require("http");
+const { Server } = require("socket.io");    //to create socket server (socket traffic method)
+const numCPUs = require("os").cpus().length;
+const { setupMaster, setupWorker } = require("@socket.io/sticky");  //allows client to make its way back to correct worker
+const { createAdapter, setupPrimary } = require("@socket.io/cluster-adapter"); //allows primary node to emit to everyone
+
+//if using node > v16 `cluster.isPrimary`
+if (cluster.isMaster) {
+  console.log(`Master ${process.pid} is running`);
+
+//----------------------------------------------------------
+//SPECIFIC CODE TO USE SOCKET SERVER WITH CLUSTER MODULE
+  const httpServer = http.createServer();
+
+  // setup sticky sessions
+  setupMaster(httpServer, {
+    loadBalancingMethod: "least-connection",    //when new connection comes in, give workload to worker with fewest connections
+  });
+
+  // setup connections between the workers
+  setupPrimary();
+
+//OPTIONAL - for packets that use raw data ------------------------------------------------------
+  // needed for packets containing buffers (you can ignore it if you only send plaintext objects)
+  // Node.js < 16.0.0
+//   cluster.setupMaster({
+//     serialization: "advanced",
+//   });
+  // Node.js > 16.0.0
+//   cluster.setupPrimary({
+//     serialization: "advanced",
+//   });
+//------------------------------------------------------------------------------------------------
+
+  httpServer.listen(3000);  //internet facing port
+  //------------------------------------------------------
+
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
+
+  cluster.on("exit", (worker) => {
+    console.log(`Worker ${worker.process.pid} died`);
+    cluster.fork();
+  });
+} else {
+  console.log(`Worker ${process.pid} started`);
+
+  const httpServer = http.createServer();
+  const io = new Server(httpServer);
+
+  // use the cluster adapter
+  io.adapter(createAdapter());      //change from default adapter
+
+  // setup connection with the primary process
+  setupWorker(io);  //setup connection with the primary process - other side to master -   setupMaster(httpServer, {})
+
+  io.on("connection", (socket) => {
+    /* ... */
+  });
+}
+```
+
 ## react
 - robert uses Create react app: `npx create-react-app react-client`
 
