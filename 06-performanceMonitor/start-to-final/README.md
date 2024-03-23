@@ -135,6 +135,47 @@ https://www.npmjs.com/package/socket.io
 https://www.npmjs.com/package/@socket.io/sticky
 https://www.npmjs.com/package/@socket.io/cluster-adapter
 
+### 71 Cluster module
+- at this point node client is pulling the correct data,
+- TODO: requires socket server to send data to
+
+- `server.js` - where server will live, but mostly contain cluster code (https://nodejs.org/api/cluster.html)
+- `socketMain.js` - most socket.io work will happen in socketMain
+- REASON for separating files, because we will use cluster module to run socket server on lots of threads, it needs to be separated into its own file.
+
+- node.js is a single threaded language, so to utilize full potential of cpu, need to use more than one thread (eg. 6core cpu is 12 threads, but nodejs app uses only 1 of the threads)
+- cluster: clusters of nodes.js processes can be used to run multiple instances of Node.js that can distribute workloads among their application threads. 
+cluster module:
+    - allows easy creation of child processes that all share server ports.
+    - cluster module's job is to spawn a whole bunch of NodeJS programs, run multiple instances of NodeJS that can distribute workloads among application threads.
+    - the thing is if we using http (STATELESS), doesnt matter what process we use because each run, a new worker is assigned,
+    - problem is with sockets, it needs to match the same worker (session) to access the local data
+    - cluster module allows multiple processes to share the same port
+
+### clusterTest.js
+- `node clusterTest.js` 
+- the js is split up into 2 parts:
+    1. FIRST TIME PROGRAM RUNS
+        - `fork()` is like running node clusterTest.js again..but but it runs else part
+        - Fork workers - depends on number of CPUs (threads)
+
+    2. EVERY OTHER TIME PROGRAM RUNS
+        - this will be replaced by a function in socketMain.js
+
+```js
+//server.js / clusterTest.js
+//cluster module
+if (cluster.isPrimary) {
+}
+else{
+    // this will be replaced by a function in socketMain.js
+}
+```
+
+```js
+//socketMain.js
+```
+
 ## react
 - robert uses Create react app: `npx create-react-app react-client`
 
