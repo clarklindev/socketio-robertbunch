@@ -5,7 +5,21 @@ const os = require('os');
 const io = require('socket.io-client');
 const socket = io('http://localhost:3000');
 socket.on('connect', ()=>{
-    console.log('NODE: we connected to the server');
+    // console.log('NODE: we connected to the server');
+    //we need a way to identify this machine
+    const nI = os.networkInterfaces();  //list of all network interfaces on this machine
+    let macA; //mac address
+    //loop through all nI until we find a non-internal one
+    for(let key in nI){
+      const isInternetFacing = !nI[key][0].internal;
+      if(isInternetFacing){
+        //we have a macA we can use.
+        macA = nI[key][0].mac;
+        break;
+      }
+    }
+    
+    console.log("mac Address:", macA);
 });
 
 //NOTE: functions are hoisted, expressions are not...

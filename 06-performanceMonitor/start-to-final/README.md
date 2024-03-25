@@ -398,6 +398,49 @@ const socketMain = (io)=>{
 module.exports = socketMain;
 ```
 
+### 75 - fetch nodeClient macAddress
+- TODO: send data from node server -> to socket server
+- socketMain.js
+- nodeClient/index.js
+  - we need a way to identify this machine to the server (for frontend usage)
+### os.networkInterfaces() 
+- returns an object containing network interfaces that have been assigned a network address.
+- each key on the returned object identifies a network interface.
+- the properties available on the assigned network address object include:
+  - address (ip4 address or ip6 address)
+  - netmask (ip4 or ip6 network mask)
+  - family (ip4 or ip6)
+  - mac (mac address of network interface)
+  - internal (boolean -> true if network interface is a loopback)
+  - scopeid (numeric ipv6 scoped id)
+  - cidr (the assigned ipv4 or ipv6 address with routing prefix in CIDR notation, if netmask is invalid, property is set to null)
+- we are interested in "internal: false", mac address.
+  
+```js
+//nodeClient/index.js
+const os = require('os');
+const io = require('socket.io-client');
+const socket = io('http://localhost:3000');
+socket.on('connect', ()=>{
+    // console.log('NODE: we connected to the server');
+    //we need a way to identify this machine
+    const nI = os.networkInterfaces();  //list of all network interfaces on this machine
+    let macA; //mac address
+    //loop through all nI until we find a non-internal one
+    for(let key in nI){
+      const isInternetFacing = !nI[key][0].internal;
+      if(isInternetFacing){
+        //we have a macA we can use.
+        macA = nI[key][0].mac;
+        break;
+      }
+    }
+
+    console.log("mac Address:", macA);
+});
+
+```
+---
 ### TROUBLESHOOTING
 - npm ERR! enoent ENOENT: no such file or directory, lstat 'C:\Users\lenovo\AppData\Roaming\npm'
 - FIX: create the folder... `mkdir %USERPROFILE%\AppData\Roaming\npm`
