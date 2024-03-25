@@ -43,7 +43,7 @@ if (cluster.isMaster) {
   //   serialization: "advanced",
   // });
 
-  httpServer.listen(3000);
+  httpServer.listen(3000);    //internet facing
 
   for (let i = 0; i < numCPUs; i++) {
     cluster.fork();
@@ -60,7 +60,12 @@ else {
   console.log(`Worker ${process.pid} started`);
 
   const httpServer = http.createServer();
-  const io = new Server(httpServer);
+  const io = new Server(httpServer, {
+    cors:{
+      origin: 'http://localhost:3001',
+      credentials: true
+    }
+  });
 
   // use the cluster adapter
   io.adapter(createAdapter());  //change from default adapter

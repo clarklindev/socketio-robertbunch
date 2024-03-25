@@ -309,6 +309,35 @@ if (cluster.isMaster) {
 ## react
 - robert uses Create react app: `npx create-react-app react-client`
 
+### 73 Connecting React to the socket.io server (for testing!)
+- start terminal and run server/ 
+- server connected on port 3000
+- adjust for cors
+```js
+//server.js
+//adjust for cors 
+const httpServer = http.createServer();
+const io = new Server(httpServer, {
+  cors:{
+    origin: 'http://localhost:3001',
+    credentials: true
+  }
+});
+```
+- creating the react client
+- start terminal and run react-client/
+- connected on port 3001
+```js
+//add react-client/src/socketConnection.js
+import io from 'socket.io-client';
+const socket = io.connect('http://localhost:3000'); //server is at 3000
+socket.on('welcome', (data)=>{
+   console.log(data); 
+});
+
+export default socket;
+```
+
 ### TROUBLESHOOTING
 - npm ERR! enoent ENOENT: no such file or directory, lstat 'C:\Users\lenovo\AppData\Roaming\npm'
 - FIX: create the folder... `mkdir %USERPROFILE%\AppData\Roaming\npm`
