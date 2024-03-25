@@ -313,6 +313,7 @@ if (cluster.isMaster) {
 - start terminal and run server/ 
 - server connected on port 3000
 - adjust for cors
+
 ```js
 //server.js
 //adjust for cors 
@@ -327,6 +328,7 @@ const io = new Server(httpServer, {
 - creating the react client
 - start terminal and run react-client/
 - connected on port 3001
+
 ```js
 //add react-client/src/socketConnection.js
 import io from 'socket.io-client';
@@ -336,6 +338,64 @@ socket.on('welcome', (data)=>{
 });
 
 export default socket;
+```
+
+### 74 Connect nodeClient to socket.io server
+- connect server/
+- connect react-client server/
+- TODO: connect node/ server
+- note: node needs to connect to where/port socket is listening... (servers.js: `httpServer.listen(3000);`)
+
+```js
+//node/index.js
+
+const os = require('os');
+const io = require('socket.io-client');
+const socket = io('http://localhost:3000');//3000 is where server is listening
+
+socket.on('connect', ()=>{
+  console.log('NODE: we connected to the server');
+});
+```
+
+- and instead of just sending feedback data by awaiting performanceLoadData(), the info should come from socketMain.js
+```js
+//COMMENT THIS OUT
+//node/index.js
+
+// const run = async ()=>{
+  //     const data = await performanceLoadData();
+//     console.log(data);
+// }
+// run();
+
+```
+
+- move the worker logic that deals with emits and listens happen
+```js
+//server/servers.js
+const socketMain = require('./socketMain.js');
+
+//...worker stuff
+else{
+  //...
+  socketMain(io);
+}
+```
+
+```js
+//server/socketMain.js
+//Where socket.io listeners and (most) emitters
+
+const socketMain = (io)=>{
+    io.on("connection", (socket) => {
+        /* ... */
+        console.log('SERVER: someone connected on worker: ', process.pid);
+        socket.emit('welcome', "SERVER: welcome to our cluster driven socket.io server");
+    });
+}
+
+module.exports = socketMain;
 ```
 
 ### TROUBLESHOOTING

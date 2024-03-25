@@ -18,6 +18,7 @@ const { Server } = require("socket.io");
 const numCPUs = require("os").cpus().length;
 const { setupMaster, setupWorker } = require("@socket.io/sticky");
 const { createAdapter, setupPrimary } = require("@socket.io/cluster-adapter");
+const socketMain = require('./socketMain.js');
 
 //PRIMARY (node > v16 cluster.isPrimary)
 if (cluster.isMaster) {
@@ -73,9 +74,8 @@ else {
   // setup connection with the primary process - other side to master -   setupMaster(httpServer, {})
   setupWorker(io);
 
-  io.on("connection", (socket) => {
-    /* ... */
-    console.log('someone connected on worker: ', process.pid);
-    socket.emit('welcome', "welcome to our cluster driven socket.io server");
-  });
+  //socketMain is our file where our emits and listens happen
+  //it needs the io
+  socketMain(io);
+  
 }

@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon servers.js"
   },
   "keywords": [],
   "author": "",
@@ -12,6 +13,7 @@
   "dependencies": {
     "@socket.io/cluster-adapter": "^0.2.2",
     "@socket.io/sticky": "^1.0.4",
+    "nodemon": "^3.1.0",
     "socket.io": "^4.7.5"
   }
 }

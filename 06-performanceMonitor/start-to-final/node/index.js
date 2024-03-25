@@ -2,6 +2,11 @@
 //and sends it via socket to the server
 //requires: socket.io-client
 const os = require('os');
+const io = require('socket.io-client');
+const socket = io('http://localhost:3000');
+socket.on('connect', ()=>{
+    console.log('NODE: we connected to the server');
+});
 
 //NOTE: functions are hoisted, expressions are not...
 
@@ -98,8 +103,9 @@ const performanceLoadData = ()=> new Promise(async (resolve, reject)=>{
     // }, 1000);
 });
 
-const run = async ()=>{
-    const data = await performanceLoadData();
-    console.log(data);
-}
-run();
+//example:
+// const run = async ()=>{
+//     const data = await performanceLoadData();
+//     console.log(data);
+// }
+// run();
