@@ -545,6 +545,10 @@ const socketMain = (io)=>{
 module.exports = socketMain;
 ```
 
+## 77 - Create react app
+- basic setup of React Create React App.
+- 
+
 ---
 ### TROUBLESHOOTING
 - npm ERR! enoent ENOENT: no such file or directory, lstat 'C:\Users\lenovo\AppData\Roaming\npm'
