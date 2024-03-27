@@ -547,9 +547,22 @@ module.exports = socketMain;
 
 ## 77 - Create react app
 - basic setup of React Create React App.
-- 
+
+## 78 - Basic React Component Architecture
+- Robert explains the architecture of the components of the react side.
+- looks like this:
+
+  - index 
+    - App
+      - Widget
+        - CPU
+        - Mem
+        - Info
+
+- and then app is where socketConnection happens and any change to the data will cause update/rerenders of the widget and its children
 
 ---
+
 ### TROUBLESHOOTING
 - npm ERR! enoent ENOENT: no such file or directory, lstat 'C:\Users\lenovo\AppData\Roaming\npm'
 - FIX: create the folder... `mkdir %USERPROFILE%\AppData\Roaming\npm`
