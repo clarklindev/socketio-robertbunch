@@ -3,7 +3,14 @@
 //requires: socket.io-client
 const os = require('os');
 const io = require('socket.io-client');
-const socket = io('http://localhost:3000');
+
+const options = {
+    auth:{
+        token: "sdfsdfsdffdhfhgjghjktry5334543asasd"
+    }
+};
+
+const socket = io('http://localhost:3000', options);
 socket.on('connect', ()=>{
     // console.log('NODE: we connected to the server');
     //we need a way to identify this machine
@@ -18,8 +25,19 @@ socket.on('connect', ()=>{
         break;
       }
     }
-    
     console.log("mac Address:", macA);
+
+    //send data
+    const perfDataInterval = setInterval(async ()=>{
+        //every second call performanceLoadData and emit
+        const perfData = await performanceLoadData()  //function returns a promise, but with await it equals the resolve() value
+        perfData.macA = macA;   //append mac address
+        socket.emit('perfData', perfData);
+    }, 1000);
+
+    socket.on('disconnect', ()=>{
+        clearInterval(perfDataInterval);    //if disconnect, stop setInterval (includes reconnect)
+    });
 });
 
 //NOTE: functions are hoisted, expressions are not...

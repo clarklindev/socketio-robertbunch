@@ -403,6 +403,10 @@ module.exports = socketMain;
 - socketMain.js
 - nodeClient/index.js
   - we need a way to identify this machine to the server (for frontend usage)
+  - use performanceLoadData(), add macAddress (macA)
+  - `socket.emit('perfData', perfData);` 
+- then in socketMain, listen for 'perfData'
+
 ### os.networkInterfaces() 
 - returns an object containing network interfaces that have been assigned a network address.
 - each key on the returned object identifies a network interface.
@@ -416,11 +420,65 @@ module.exports = socketMain;
   - cidr (the assigned ipv4 or ipv6 address with routing prefix in CIDR notation, if netmask is invalid, property is set to null)
 - we are interested in "internal: false", mac address.
   
+### 76 - Start the ticking clock
+- ensure interval is cleared when disconnected, this includes reconnect...
+- nodeConnect emits performance data object which includes the mac Address then sends it to socket server: 
+`const socket = io('http://localhost:3000');`
+- ensure node on disconnect, clears interval - if disconnect, stop setInterval (this includes reconnect)
+- then in //server/socketMain.js we listen for perfData
+
+### auth (6min)
+- //server/socketMain.js: with io() pass an object with 'auth' prop
+
+```js
+//nodeClient/index.js
+import {io} from 'socket.io-client';
+
+//METHOD: tut method:
+const options = {
+  auth:{
+    token: "sdfsdfsdffdhfhgjghjktry5334543asasd"
+  }
+};
+const socket = io('http://localhost:3000', options);
+
+
+//METHOD: basic example
+const socket = io({
+  auth:{
+    token:"abcd"
+  }
+});
+
+//METHOD: with callback
+const socket = io({
+  auth: (cb)=>{
+    cb({token: localStorage.token})
+  }
+});
+```
+- access via socket.handshake... 
+
+```js
+//server/socketMain.js
+const auth = socket.handshake.auth;
+console.log(auth); //prints {token : "abcd"}
+```
+
+---
+### FULL EXAMPLE
+
 ```js
 //nodeClient/index.js
 const os = require('os');
 const io = require('socket.io-client');
-const socket = io('http://localhost:3000');
+const options = {
+  auth:{
+    token: "sdfsdfsdffdhfhgjghjktry5334543asasd"
+  }
+};
+const socket = io('http://localhost:3000', options);
+
 socket.on('connect', ()=>{
     // console.log('NODE: we connected to the server');
     //we need a way to identify this machine
@@ -437,9 +495,56 @@ socket.on('connect', ()=>{
     }
 
     console.log("mac Address:", macA);
+
+    //send data
+    const perfDataInterval = setInterval(async ()=>{
+      //every second call performanceLoadData and emit
+      const perfData = await performanceLoadData();  //function returns a promise, but with await it equals the resolve() value
+      perfData.macA = macA;
+      socket.emit('perfData', perfData);
+    }, 1000);
+
+    //clear interval 
+    socket.on('disconnect', ()=>{
+        clearInterval(perfDataInterval);    //if disconnect, stop setInterval (includes reconnect)
+    })
 });
 
 ```
+
+```js
+//server/socketMain.js
+//Where socket.io listeners and (most) emitters
+
+const socketMain = (io)=>{
+    io.on("connection", (socket) => {
+      /* ... */
+      console.log('SERVER: someone connected on worker: ', process.pid);
+      socket.emit('welcome', "SERVER: welcome to our cluster driven socket.io server");
+
+      const auth = socket.handshake.auth;
+      const token = auth.token;
+      console.log('token: ', token);
+      if(token === "sdfsdfsdffdhfhgjghjktry5334543asasd"){
+        socket.join('nodeClient');      //client is a nodeClient
+      }else if(token ==="jdkfjwjhkwffje"){
+        //valid reactClient
+        socket.join('reactClient');      //client is a nodeClient
+      }else{
+        socket.disconnect();
+        console.log('YOU HAVE BEEN DISCONNECTED');
+      }
+
+      socket.on('perfData', (data)=>{
+        console.log(`ticking...${data}`);
+      });
+
+    });
+}
+
+module.exports = socketMain;
+```
+
 ---
 ### TROUBLESHOOTING
 - npm ERR! enoent ENOENT: no such file or directory, lstat 'C:\Users\lenovo\AppData\Roaming\npm'

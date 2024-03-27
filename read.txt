@@ -1,0 +1,5 @@
+RUN:
+
+git config --global --add safe.directory *path to git repo* 
+
+eg. git config --global --add safe.directory C:/Users/lenovo/Downloads/socketio/socketio-robbertbunch
