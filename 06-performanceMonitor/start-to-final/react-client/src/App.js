@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 
-import socket from './socketConnection';
+import socket from './utilities/socketConnection';
 import Widget from './perfDataComponents/Widget';
 
 function App() {
@@ -20,14 +20,14 @@ function App() {
       setPerformanceData(copyPerfData);
       
     });
-  }, []);//run this once the component has rendered
+  }, [performanceData]);//run this once the component has rendered
 
   const widgets = Object.values(performanceData).map(d=><Widget data={d} key={d.macA}/>); //performanceData stores array of objects whose key is the macA
 
   return (
-    <>
+    <div className="container">
       {widgets}
-    </>
+    </div>
   );
 }
 

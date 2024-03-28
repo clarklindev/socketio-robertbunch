@@ -704,7 +704,11 @@ const Widget = ({data})=> {
   )
 }
 ```
-
+## 83 - ui 
+- add bootstrap to react index html head
+```html
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+``` 
 
 ### TROUBLESHOOTING
 - npm ERR! enoent ENOENT: no such file or directory, lstat 'C:\Users\lenovo\AppData\Roaming\npm'

@@ -1,4 +1,4 @@
 const Mem = ()=>{
-    return <h1>Mem</h1>
+    return <div className="mem col-3">Mem</div>
 }
 export default Mem;
