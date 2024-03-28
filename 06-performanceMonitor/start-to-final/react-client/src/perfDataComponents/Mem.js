@@ -15,7 +15,7 @@ const Mem = ({data})=>{
         <h3>Memory usage</h3>
         <div className="canvas-wrapper">
             <canvas ref={memRef} width="200" height="200"/>
-            <div className="mem-text">{memUsage * 100}%</div>
+            <div className="mem-text">{Math.floor(memUsage * 100)}%</div>
         </div>
         <div>
             Total Memory: {totalMemInGB} gb

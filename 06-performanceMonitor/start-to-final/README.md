@@ -754,6 +754,38 @@ export default drawCircle;
 ## 84 CPU widget
 ## 85 memory widget
 
+## 86 add isAlive, disconnect, final touches
+- status update when disconnected
+- do this in wdiget.js (react-client), listen for socket.on('connectedOrNot') , it checks if node has disconnected
+- the widget knows the macAddress of the machine for that specific widget
+- in server/socketMain.js listen for `socket.on('disconnect', (reason)=>{})` this is for when a nodeClient has just disconnected, 
+let the frontend know
+- in socketMain, you need to create a variable to keep track of machines mac Address, and when it starts ticking, save the macAddress, then when it stops ticking, you still have access to the macAddress.
+- because each Widget only keeps track of one machine, you can compare: `machineMacAddress === macA`
+- if the node gets restarted back up, need to update 
+
+```js
+//Widget.js
+import { useEffect } from 'react';
+import socket from '../utilities/socketConnection';
+
+useEffect(()=>{
+  socket.on('connectedOrNot', ({isAlive, machineMacA})=>{
+    //connectedOrNot does NOT mean THIS react client has disconnected (or reconnected)
+    //it is for one of the nodeClients that is ticking
+    //we need a new event for that, because that nodeClient has stopped ticking
+  });
+
+},[]);
+```
+
+```js
+//server/socketMain
+socket.on('disconnect', (reason)=>{
+  io.to('reactClient') .emit('connectedOrNot');
+})
+```
+
 
 ### TROUBLESHOOTING
 - npm ERR! enoent ENOENT: no such file or directory, lstat 'C:\Users\lenovo\AppData\Roaming\npm'
