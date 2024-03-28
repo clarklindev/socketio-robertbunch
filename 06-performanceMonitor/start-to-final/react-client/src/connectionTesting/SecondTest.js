@@ -3,7 +3,7 @@ import socket from '../socketConnection';
 
 const SecondTest = ()=>{
     useEffect(()=>{
-        socket.emit('secondTest', 'datadatadata')
+        socket.emit('secondTest', 'datadatadata');
     });
 
     return <h2>Second Test</h2>

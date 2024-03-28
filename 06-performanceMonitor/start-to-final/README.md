@@ -622,12 +622,44 @@ export default App;
 
 ```
 
-
 ## 80 - Connecting React to socketio in a complex app
 - lesson incomplete, use lesson 79 method.
 - in a large codebase, you centralize logic
 
 ---
+
+## 81 - getting data to react, setting up react components
+- get data from socket server to react
+- reset app to use `<App>` and not `<TestApp>` as in lesson 79
+- nodeClient emits perfData every second.
+- socketMain.js receives this perfData and itself emits to reactClient "room": `io.to('reactClient').emit('perfData', data);`
+- in reactClient, setup useState, intially empty {}
+- using data.macA as the index in the object: the props of object are set as the macA (mac address): `copyPerfData[data.macA]`
+
+
+```js
+//nodeClient
+function App() {
+  const [performanceData, setPerformanceData] = useState({}); //an object, using macAddress as the prop 
+
+  useEffect(()=>{
+    socket.on('perfData', (data)=>{
+      console.log('App: ', data);
+
+      //copy performanceData so we can mutate it
+      const copyPerfData = {...performanceData};
+      //performanceData is not an array, its an {}
+      //this is because we dont know which machine just sent its data,
+      //so we can use the macA of the machine as its property in performanceData
+      //every tick the data comes through, just overwrite that value
+      copyPerfData[data.macA] = data;
+      setPerformanceData(copyPerfData);
+      
+    });
+  }, []);//run this once the component has rendered
+}
+
+```
 
 ### TROUBLESHOOTING
 - npm ERR! enoent ENOENT: no such file or directory, lstat 'C:\Users\lenovo\AppData\Roaming\npm'
