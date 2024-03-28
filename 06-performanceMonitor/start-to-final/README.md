@@ -751,6 +751,10 @@ const drawCircle = (canvas, currentLoad)=>{
 export default drawCircle;
 
 ```
+## 84 CPU widget
+## 85 memory widget
+
+
 ### TROUBLESHOOTING
 - npm ERR! enoent ENOENT: no such file or directory, lstat 'C:\Users\lenovo\AppData\Roaming\npm'
 - FIX: create the folder... `mkdir %USERPROFILE%\AppData\Roaming\npm`
