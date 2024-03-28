@@ -11,7 +11,7 @@ const socketMain = (io)=>{
         console.log('token: ', token);
         if(token === "sdfsdfsdffdhfhgjghjktry5334543asasd"){
             socket.join('nodeClient');      //client is a nodeClient
-        }else if(token ==="jdkfjwjhkwffje"){
+        }else if(token ==="jdkfjwjhkwffjeasasccccccs3"){
             //valid reactClient
             socket.join('reactClient');      //client is a nodeClient
         }else{
@@ -22,6 +22,14 @@ const socketMain = (io)=>{
         socket.on('perfData', (data)=>{
             console.log(`ticking...${data}`);
         });
+
+        socket.on('testConnection', (data)=>{
+            console.log('data:', data);
+        })
+
+        socket.on('secondTest', (data)=>{
+            console.log('secondTest:', data);
+        })
 
         
     });

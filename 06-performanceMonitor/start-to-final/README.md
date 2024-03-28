@@ -561,6 +561,72 @@ module.exports = socketMain;
 
 - and then app is where socketConnection happens and any change to the data will cause update/rerenders of the widget and its children
 
+## 79 - Connecting React to socket server (correct way)
+- NOTE: there is nothing new other than basic React imports
+- this is Roberts way of connecting to the socket server using React until his more advanced method in lesson 80.
+- socketConnection.js -> connect to socket server with auth object...
+- use connectionTesting/TestApp to test by emitting "testConnection" with a message, 
+- socketMain.js should add socket listener for the emitted:  `socket.on('testConnection', (data)=>{})`
+- TOTEST: run react-client/
+- TOTEST: run server/
+
+
+```js
+//socketConnection.js
+import io from 'socket.io-client';
+
+const options = {
+   auth: {token: 'jdkfjwjhkwffjeasasccccccs3'}
+}
+
+const socket = io.connect('http://localhost:3000', options); //server is at 3000
+// socket.on('welcome', (data)=>{
+//    console.log('REACT: ', data); 
+// });
+export default socket;
+```
+
+```js
+//connectionTesting/TestApp.js
+import { useEffect } from "react";
+import socket from '../socketConnection';
+
+const TestApp = ()=>{
+
+    useEffect(()=>{
+        socket.emit('testConnection', 'am i connected?');
+    },[]);
+
+    return <h1>Test app</h1>
+}
+
+export default TestApp;
+```
+
+```js
+//socketMain.js
+socket.on('testConnection', (data)=>{
+  console.log(data);
+});
+```
+
+```js
+//app.js
+import socketConnection from './socketConnection';
+function App() {
+  return (
+    <h1>sanity check</h1>
+  );
+}
+export default App;
+
+```
+
+
+## 80 - Connecting React to socketio in a complex app
+- lesson incomplete, use lesson 79 method.
+- in a large codebase, you centralize logic
+
 ---
 
 ### TROUBLESHOOTING
