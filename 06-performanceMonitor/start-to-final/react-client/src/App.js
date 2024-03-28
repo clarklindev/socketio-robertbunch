@@ -22,8 +22,12 @@ function App() {
     });
   }, []);//run this once the component has rendered
 
+  const widgets = Object.values(performanceData).map(d=><Widget data={d} key={d.macA}/>); //performanceData stores array of objects whose key is the macA
+
   return (
-    <Widget/>
+    <>
+      {widgets}
+    </>
   );
 }
 

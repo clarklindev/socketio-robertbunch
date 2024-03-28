@@ -636,6 +636,8 @@ export default App;
 - in reactClient, setup useState, intially empty {}
 - using data.macA as the index in the object: the props of object are set as the macA (mac address): `copyPerfData[data.macA]`
 
+## 82 - sending state to our `<Widget/>`
+- pass the relevant data into the Widget and subwidgets
 
 ```js
 //nodeClient
@@ -657,9 +659,52 @@ function App() {
       
     });
   }, []);//run this once the component has rendered
+
+  const widgets = Object.values(performanceData).map(d=><Widget data={d} key={d.macA}/>); //performanceData stores array of objects whose key is the macA
+
+  return (
+    <>
+      {widgets}  
+    </>
+  );
+
 }
 
 ```
+```js
+//widget
+//...
+const Widget = ({data})=> {
+
+  const {
+    freeMem,
+    totalMem,
+    usedMem,
+    memUsage,
+    osType,
+    upTime,
+    cpuType,
+    numCores,
+    cpuSpeed,
+    cpuLoad,
+    macA
+  } = data;
+
+  const cpuData = {cpuLoad};
+  const memData = {freeMem, totalMem, usedMem, memUsage};
+  const infoData = {macA, osType, upTime, cpuType, cpuSpeed, numCores};
+
+  //...
+  return (
+    <>
+      <Cpu data={cpuData}/>
+      <Mem data={memData}/>
+      <Info data={infoData}/>
+    </>
+  )
+}
+```
+
 
 ### TROUBLESHOOTING
 - npm ERR! enoent ENOENT: no such file or directory, lstat 'C:\Users\lenovo\AppData\Roaming\npm'
