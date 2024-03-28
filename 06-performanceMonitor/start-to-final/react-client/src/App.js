@@ -7,9 +7,10 @@ function App() {
   const [performanceData, setPerformanceData] = useState({}); //an object, using macAddress as the prop 
 
   useEffect(()=>{
-    socket.on('perfData', (data)=>{
-      console.log('App: ', data);
 
+    function updatePerformanceData(data){
+      console.log('App: ', data);
+  
       //copy performanceData so we can mutate it
       const copyPerfData = {...performanceData};
       //performanceData is not an array, its an {}
@@ -18,8 +19,13 @@ function App() {
       //every tick the data comes through, just overwrite that value
       copyPerfData[data.macA] = data;
       setPerformanceData(copyPerfData);
-      
-    });
+    }
+
+    socket.on('perfData', updatePerformanceData);
+
+    return ()=>{
+      socket.removeListener('perfData', updatePerformanceData);
+    }
   }, [performanceData]);//run this once the component has rendered
 
   const widgets = Object.values(performanceData).map(d=><Widget data={d} key={d.macA}/>); //performanceData stores array of objects whose key is the macA

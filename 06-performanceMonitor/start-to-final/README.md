@@ -785,6 +785,10 @@ socket.on('disconnect', (reason)=>{
   io.to('reactClient') .emit('connectedOrNot');
 })
 ```
+---
+
+# 7 Admin UI
+- socketio comes with admin ui which is like a prebuilt interface to give stats about the sockets.
 
 
 ### TROUBLESHOOTING

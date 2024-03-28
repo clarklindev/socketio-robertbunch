@@ -39,7 +39,7 @@ const Widget = ({data})=> {
             }
         });
     
-    },[]);
+    },[macA]);
 
     return (
     <div className="widget row justify-content-evenly">
