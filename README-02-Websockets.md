@@ -128,4 +128,17 @@ wss.on('connection',(ws,req)=>{
 server.listen(8000);
 ```
 
+### NOTES
+
+- justWs.html represents client side (console logs in browser console)
+- justWsServer.js represents server side (console logs in cmd where node server connected)
+
+#### STEPS:
+1. open justWs.html (directly without live-server) 
+2. start server/websocket server: `nodemon justWsServer.js`
+3. hit refresh on the brower opened justWs.html
+
+4. both (client and server send their on-connection message)
+5. both are listening for messages -> when received -> log it
+
 ---

@@ -5,13 +5,15 @@
     let ws = new WebSocket('ws://localhost:8000');
     console.log(ws);
 
+    //step1: on client - send websocket message
     ws.onopen = (event)=>{
         console.log(event);
-        ws.send("I'm so excited I'm connected to the server. It's like my country just won the World Cup!")
+        ws.send("I'm so excited I'm connected to the server. It's like my country just won the World Cup!");//picked up by server 
     }
 
+    //step2: listen to message event
     ws.onmessage = (message)=>{
-        console.log(message.data);
+        console.log("browser: ", message.data);
     }
 
 </script>
