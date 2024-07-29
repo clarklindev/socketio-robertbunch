@@ -56,9 +56,9 @@
     
     document.querySelector('#message-form').addEventListener('submit',(event)=>{
         event.preventDefault();
-        const newMessage = document.querySelector('#user-message').value
+        const newMessage = document.querySelector('#user-message').value;
         console.log(newMessage);
-        socket.emit('newMessageToServer',{text:newMessage})
+        socket.emit('newMessageToServer',{text:newMessage});
     })
 
 </script> 

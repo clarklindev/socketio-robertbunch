@@ -4,7 +4,9 @@
 
 const express = require('express');
 const app = express();
-const socketio = require('socket.io')
+const socketio = require('socket.io');
+
+console.log('open http://localhost:8000/chat.html')
 
 app.use(express.static(__dirname + '/public'));
 
