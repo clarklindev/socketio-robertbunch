@@ -4,13 +4,22 @@
 const express = require('express');
 const app = express();
 const socketio = require('socket.io');
-const namespaces = require('./data/namespaces');
 const Room = require('./classes/Room');
+const namespaces = require('./data/namespaces');
+
+const PORT = process.env.PORT || 9000;
 
 app.use(express.static(__dirname + '/public'));
 
-const expressServer = app.listen(9000); //http traffic
+const expressServer = app.listen(PORT); //http traffic
+
 const io = socketio(expressServer);  //socket tcp traffic gives access to <script src="/socket.io/socket.io.js"></script> in slack.html
+
+// Attach Socket.IO instance to Express app
+app.set('io',io);
+
+// later... retrieve the `socket.io` instance from the app object
+// const io = app.get('io');
 
 io.on('connection', (socket)=>{
 
