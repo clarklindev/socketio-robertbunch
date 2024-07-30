@@ -106,6 +106,14 @@
 <script src="/buildMessageHtml.js"></script>
 <script src="/joinRoom.js"></script>
 <script src="/joinNs.js"></script>
+
+<script>
+  fetch('/config')
+    .then(response => response.json())
+    .then(config => {
+      window.env = config; // Make config (object) available to client-side scripts 
+    });
+</script>
 <script src="/client-scripts.js"></script>
 
 
