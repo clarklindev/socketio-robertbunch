@@ -3,10 +3,10 @@
 
 //fake authentication - user login 
 //remove prompts to save time - this should be the authentication part anyways (out-of-scope)...
-// const userName = prompt('what is your username?');
-// const password = prompt('what is your password?');
-const userName = "Rob";
-const password = "x";
+const userName = prompt('what is your username?');
+const password = prompt('what is your password?');
+// const userName = "Rob";
+// const password = "x";
 
 const clientOptions = {
     reconnectionDelayMax: 1000,

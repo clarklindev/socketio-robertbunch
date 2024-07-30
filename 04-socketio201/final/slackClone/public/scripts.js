@@ -1,10 +1,10 @@
 
-// const userName = prompt("What is your username?");
-// const password = prompt("What is your password?");
+const userName = prompt("What is your username?");
+const password = prompt("What is your password?");
 
 //Temp remove the promt's to save dev headaches!
-const userName = "Rob";
-const password = "x";
+// const userName = "Rob";
+// const password = "x";
 
 const clientOptions = {
     query:{

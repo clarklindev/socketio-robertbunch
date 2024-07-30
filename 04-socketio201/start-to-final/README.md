@@ -1,10 +1,14 @@
 # Slack App
 - to get this working
 - install packages...
-- `nodemon slackClone/slack.js`
+- pnpm run dev -> `nodemon slackClone/slack.js`
 - localhost:9000/slack.html
 
 ```cmd
 //slackClone from folder: 04-socketio201/
 nodemon slackClone/slack.js 
 ```
+
+### open 2 browser windows (one in incogito)
+- to test open one window in incognito: http://localhost:9000/slack.html
+- open another window normally: http://localhost:9000/slack.html
