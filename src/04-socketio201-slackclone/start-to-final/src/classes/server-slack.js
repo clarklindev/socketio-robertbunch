@@ -1,11 +1,11 @@
 // SERVER
 //console logs are output on terminal in vscode
-import express from 'express';
-import { createServer } from 'node:http';
-import { Server } from 'socket.io';
+import express from "express";
+import { createServer } from "node:http";
+import { Server } from "socket.io";
 
-import Room from './Room';
-import Namespace from './Namespace';
+import Room from "./Room";
+import namespaces from "@/data/namespaces";
 
 const app = express();
 const server = createServer(app);
@@ -16,7 +16,6 @@ const PORT = process.env.PORT || 9000;
 app.use(express.static(__dirname + "/public"));
 
 const expressServer = app.listen(PORT); //http traffic
-
 
 // Attach Socket.IO instance to Express app
 app.set("io", io);
@@ -38,7 +37,6 @@ io.on("connection", (socket) => {
   //     io.emit('newMessageToClients',{text:dataFromClient.text});
   // });
 });
-
 
 // manufactured way to change an ns (without building a huge UI)
 app.get("/change-ns", (req, res) => {

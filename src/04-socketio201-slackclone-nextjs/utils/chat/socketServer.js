@@ -32,6 +32,9 @@ export function initializeSockets() {
     // const thisNs = io.of(namespace.endpoint);
     // thisNs.on('connection', (socket)=>{
     // });
+
+    // io.of(namespace.endpoint) -> initializes a namespace in Socket.IO.
+    //'.of(namespace.endpoint)' -> creates or retrieves a namespace based on the namespace and endpoint
     io.of(namespace.endpoint).on("connection", (socket) => {
       console.log(`${socket.id} has connected to ${namespace.endpoint}`);
       //roomObj passed from joinRoom.js - joinRoom()
@@ -82,6 +85,14 @@ export function initializeSockets() {
 
         //broadcast this to all connected clients in room
         //how can we find out what room this socket is in?
+
+        // socket.rooms is a property that contains a Set-like object listing all rooms (including the default room) that the socket is currently joined to.
+        // By default, a socket is always joined to its own room, identified by its socket.id.
+        // [...rooms] converts the rooms Set-like object into an array. This is done to easily access individual elements of the Set.
+        // Sets do not support direct indexing like arrays (rooms[1] wouldn't work directly on a Set).
+        // The first element ([0]) is typically the socket's own room, identified by its socket.id.
+        // The second element ([1]) is often the specific room the socket has joined.
+
         const rooms = socket.rooms;
         const currentRoom = [...rooms][1];
 

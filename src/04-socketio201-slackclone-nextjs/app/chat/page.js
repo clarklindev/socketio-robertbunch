@@ -3,7 +3,7 @@
 import io from "socket.io-client";
 import { useContext } from "react";
 
-import NotificationContext from "@/context/chat/SocketContext";
+import socketContext from "@/context/chat/SocketContext";
 import { handleMessage } from "@/lib/chat/actions";
 
 import "./page.css";
@@ -30,9 +30,15 @@ import "./page.css";
 //     },
 //   };
 
-//   // always join the main namespace, thats where the client gets the namespaces from
-// const socket = io("http://localhost:9000", clientOptions); //available because slack.html <script src="/socket.io/socket.io.js"></script>
-const socket = io();
+// always join the main namespace, thats where the client gets the namespaces from
+// const socket = io("http://localhost:9000", clientOptions); //available because of `import io from "socket.io-client";` OR slack.html <script src="/socket.io/socket.io.js"></script>
+const socket = io(); //connecting to the default namespace, which is the main namespace in Socket.IO.
+//Unique Socket IDs: Each time a client connects to the server, Socket.IO assigns a unique identifier to that connection called a socket.id. This ID is unique per connection and is how the server identifies each connected client.
+//Custom Identifiers: You can pass additional data or identifiers when establishing a connection by including query parameters or using custom events. For example, you can connect with custom query parameters to identify the client:
+//eg.
+// const socket = io('/my-namespace', {
+//   query: { userId: '12345' }
+// });
 
 //lesson 38 FIX 1: sockets will be put into this array, in the index of their ns.id
 const nameSpaceSockets = [];
@@ -42,9 +48,9 @@ const listeners = {
   messageToRoom: [],
 };
 
-//   //a global variable we update when the user updates the namespace
-//   //use statemanagement...
-//   let selectedNsId = 0;
+//a global variable we update when the user updates the namespace
+//use statemanagement...
+let selectedNsId = 0;
 
 //----------------
 //form handling here...
@@ -52,42 +58,42 @@ const listeners = {
 //form handling end
 //----------------
 
-//   //   nameSpaceSockets[selectedNsId].emit("newMessageToRoom", {
-//   //     newMessage,
-//   //     date: Date.now(),
-//   //     avatar: "https://via.placeholder.com/30",
-//   //     userName,
-//   //     selectedNsId,
-//   //   });
+//   nameSpaceSockets[selectedNsId].emit("newMessageToRoom", {
+//     newMessage,
+//     date: Date.now(),
+//     avatar: "https://via.placeholder.com/30",
+//     userName,
+//     selectedNsId,
+//   });
 
-//   //   document.querySelector("#user-message").value = "";
-//   // });
+//   document.querySelector("#user-message").value = "";
+// });
 
-//   //lesson 38 (7min2sec)
-//   //client addListeners job is to manage all listeners added to all namespaces
-//   //this prevents listeners being added multiple times
-//   // const addListeners = (nsId) => {
-//   //   if (!listeners.nsChange[nsId]) {
-//   //     nameSpaceSockets[nsId].on("nsChange", (data) => {
-//   //       console.log("NAMESPACE CHANGED");
-//   //       console.log(data);
-//   //     });
-//   //     listeners.nsChange[nsId] = true;
-//   //   }
+//lesson 38 (7min2sec)
+//client addListeners job is to manage all listeners added to all namespaces
+//this prevents listeners being added multiple times
+// const addListeners = (nsId) => {
+//   if (!listeners.nsChange[nsId]) {
+//     nameSpaceSockets[nsId].on("nsChange", (data) => {
+//       console.log("NAMESPACE CHANGED");
+//       console.log(data);
+//     });
+//     listeners.nsChange[nsId] = true;
+//   }
 
-//   //   //lesson 42 - emit messages to room
-//   //   if (!listeners.messageToRoom[nsId]) {
-//   //     //add the nsId listener to this namespace
-//   //     nameSpaceSockets[nsId].on("messageToRoom", (messageObj) => {
-//   //       console.log(messageObj);
+//   //lesson 42 - emit messages to room
+//   if (!listeners.messageToRoom[nsId]) {
+//     //add the nsId listener to this namespace
+//     nameSpaceSockets[nsId].on("messageToRoom", (messageObj) => {
+//       console.log(messageObj);
 
-//   //       //add message to DOM
-//   //       document.querySelector("#messages").innerHTML +=
-//   //         buildMessageHtml(messageObj);
-//   //     });
-//   //     listeners.messageToRoom[nsId] = true;
-//   //   }
-//   // };
+//       //add message to DOM
+//       document.querySelector("#messages").innerHTML +=
+//         buildMessageHtml(messageObj);
+//     });
+//     listeners.messageToRoom[nsId] = true;
+//   }
+// };
 
 //   socket.on("connect", () => {
 //     console.log("Connected");
@@ -178,7 +184,8 @@ const listeners = {
 //   // })
 
 //   /*
-//   messageObj structure {
+//   messageObj structure:
+// {
 //       newMessage,
 //       date,
 //       userName,
@@ -285,18 +292,27 @@ const listeners = {
 // }
 
 export default function ChatPage() {
-  const notificationCtx = useContext(NotificationContext);
+  const socketCtx = useContext(socketContext);
 
-  //call an exposed context function eg. notificationCtx.
-  notificationCtx.sayHello();
+  //call an exposed context function eg. socketCtx.
+  socketCtx.sayHello();
 
   return (
     <main>
-      <ul id="messages"></ul>
-      <form id="form" action={handleMessage}>
-        <input id="input" name="message" autoComplete="off" />
-        <button>Send</button>
-      </form>
+      <div className="sidemenu">hey</div>
+      <div className="subsidemenu">yo</div>
+      <div className="content">
+        <h2 className="room-heading">hello</h2>
+        <ul id="messages" className="messages">
+          <li>hey</li>
+          <li>hey</li>
+          <li>hey</li>
+        </ul>
+        <form id="form" action={handleMessage}>
+          <input id="input" name="message" autoComplete="off" />
+          <button>Send</button>
+        </form>
+      </div>
     </main>
   );
 }

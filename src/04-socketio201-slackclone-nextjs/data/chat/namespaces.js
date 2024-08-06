@@ -1,6 +1,9 @@
 import Namespace from "@/utils/chat/Namespace";
 import Room from "@/utils/chat/Room";
 
+// Namespace(id, name, image, endpoint)
+//.addRoom()
+
 //here we are hardcoding; in production: connect to database to get data
 const wikiNs = new Namespace(
   0,
