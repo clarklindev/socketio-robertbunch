@@ -1,30 +1,4 @@
-import { Server } from "socket.io";
-import namespaces from "@/data/chat/namespaces";
-
-export function initializeSocketServer(server) {
-  const io = new Server(server);
-  server.io = io; // Assign the io instance to server: res.socket.server.io
-
-  //set up connection event handlers
-  io.on("connection", (socket) => {
-    console.log(socket.handshake);
-    socket.emit("message", "Welcome to the server!");
-
-    socket.on("clientConnect", (data) => {
-      console.log(socket.id, "has connected");
-      socket.emit("nsList", namespaces); //send  namespaces to client
-    });
-
-    socket.on("newMessageToServer", (dataFromClient) => {
-      console.log("Data:", dataFromClient);
-      io.emit("newMessageToClients", { text: dataFromClient.text });
-    });
-
-    socket.on("disconnect", () => {
-      console.log("user disconnected");
-    });
-  });
-}
+import { namespaces } from "@/data/chat/namespaces";
 
 export function initializeSockets() {
   //lesson 35
@@ -72,6 +46,7 @@ export function initializeSockets() {
           .of(namespace.endpoint)
           .in(roomObj.roomTitle)
           .fetchSockets();
+
         const socketCount = sockets.length;
 
         ackCallback({

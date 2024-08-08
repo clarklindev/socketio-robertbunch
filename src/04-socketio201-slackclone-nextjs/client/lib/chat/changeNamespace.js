@@ -1,6 +1,6 @@
 import namespaces from "@/data/chat/namespaces";
 
-export function handler(req, res) {
+export function changeNamespace(req, res) {
   const io = res.socket.server.io;
 
   // manufactured way to change an ns (without building a huge UI)

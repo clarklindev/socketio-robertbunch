@@ -1,5 +1,5 @@
-import Namespace from "@/utils/chat/Namespace";
-import Room from "@/utils/chat/Room";
+import Namespace from "@/lib/chat/Namespace";
+import Room from "@/lib/chat/Room";
 
 // Namespace(id, name, image, endpoint)
 //.addRoom()
