@@ -1,14 +1,12 @@
 import express from "express";
 import { createNamespace } from "../controllers/createNamespace.js";
 import { addRoomToNamespace } from "../controllers/addRoomToNamespace.js";
+import { getNamespaces } from "../controllers/getNamespaces.js";
 
 const router = express.Router();
 
 //api/socket/namespaces
-router.get("/namespaces", (req, res) => {
-  res.json({ status: "OK" });
-});
-
+router.get("/namespaces", getNamespaces);
 router.post("/namespaces", createNamespace);
 router.post("/namespaces/add-room", addRoomToNamespace);
 

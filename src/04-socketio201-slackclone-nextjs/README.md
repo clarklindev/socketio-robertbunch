@@ -20,6 +20,10 @@
 
 ## Populating Database (Namespace and Rooms)
 
+- created mongoose models for Namespace and Room and Message.
+- after initiating mongodb via mongoose you have ability to add Namespaces, Rooms via POSTMAN
+- the server is now able to get the namespaces directly from the db
+
 ### Namespace
 
 ```js
