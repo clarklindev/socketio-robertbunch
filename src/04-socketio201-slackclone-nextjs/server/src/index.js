@@ -16,10 +16,9 @@ async function init() {
     );
 
     const app = express(); //create express app
-    const port = process.env.PORT || 3000;
 
     const corsOptions = {
-      origin: `${process.env.FRONTEND_URL}:${process.env.FRONTEND_PORT}`, // Replace with your frontend URL
+      origin: `${process.env.FRONTEND_URL}:${process.env.FRONTEND_PORT}`, // Replace with connecting frontend URL
     };
     app.use(cors(corsOptions)); //cors order important: needs to come before express.json()
 
@@ -38,12 +37,15 @@ async function init() {
       res.status(500).send("Something broke!");
     });
 
+    const serverPort = process.env.SERVER_PORT;
+
     const httpServer = http.createServer(app); // Create an HTTP server and pass the Express app to it
-    httpServer.listen(port, (err) => {
+    httpServer.listen(serverPort, (err) => {
       if (err) {
         throw err;
       }
-      console.log(`Ready on http://localhost:${port}`);
+
+      console.log(`listening on port: ${serverPort}`);
     });
 
     //graceful shutdown mechanism to close connections and cleanup resources when the server is terminated

@@ -1,43 +1,59 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## ENVIRONMENT VARIABLES
 
-## Create project
-- create a directory and navigate to it
+### (CLIENT + SERVER) REQUIRED
 
-```cmd
-pnpm create next-app@latest .
+- `SERVER_PORT`:
+  This is crucial for the server. It defines which port the server will listen on for incoming connections. In your case, you’ve set SERVER_PORT=3000, so your server will listen on port 3000 for incoming HTTP requests.
+
+### CLIENT REQUIRED
+
+- `SERVER_URL`:
+  This is typically used by the client to know the URL of the server to connect to. For server-side code, you generally don’t need to specify SERVER_URL unless you are using it for some specific internal purposes or configurations.
+
+### SERVER REQUIRED
+
+- `FRONTEND_URL`:
+  This is used to configure CORS (Cross-Origin Resource Sharing) on the server. It tells the server which origin (frontend URL) is allowed to make requests to it. This is important for security to ensure that only trusted origins can access your server’s resources.
+
+- `FRONTEND_PORT`:
+  This works in conjunction with FRONTEND_URL to specify the complete origin (e.g., http://localhost:3000). It helps define the exact port where the frontend application is running. The server uses this to allow or deny requests based on the origin.
+
+## Populating Database (Namespace and Rooms)
+
+### Namespace
+
+```js
+//USE server API and POST body:
+fetch("http://localhost:3000/api/namespaces", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    data: {
+      name: "My New Namespace",
+      image: "http://example.com/image.jpg",
+      endpoint: "/my-new-namespace",
+    },
+  }),
+});
 ```
 
-## Getting Started
+## Rooms
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```js
+fetch("http://localhost:3000/api/namespaces/add-room", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    namespaceId: "64b06d3e3a99a5e8c89f30e2", // Example ObjectId
+    roomData: {
+      roomTitle: "General",
+      privateRoom: false,
+      // history: [],
+    },
+  }),
+});
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
