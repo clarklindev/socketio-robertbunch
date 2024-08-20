@@ -116,6 +116,7 @@ input {
     /* width: 50px; */
     /* display: inline-block; */
 }
+
 #messages li .user-message{
     margin-left: 10px;
     color: #fff;
