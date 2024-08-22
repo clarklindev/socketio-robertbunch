@@ -4,8 +4,9 @@ export async function initSocketHandlers(io) {
   console.log("SERVER: STEP 06 - FUNCTION initSocketHandlers()");
 
   //set up connection event handlers
+  //'connection' is when CLIENT: SocketContext calls const newSocket = io(`${process.env.NEXT_PUBLIC_SERVER_URL}:${process.env.NEXT_PUBLIC_SERVER_PORT}`);
   io.on("connection", (socket) => {
-    console.log(`SERVER: receives 'clientConnect' (${socket.id}) connected to socket server`);
+    console.log(`SERVER: receives 'connection' from client calling io(${process.env.SERVER_URL}:${process.env.SERVER_PORT})`);
     // console.log(socket.handshake);
     
     //EMIT
@@ -16,6 +17,7 @@ export async function initSocketHandlers(io) {
       console.log(`SERVER: receives 'clientConnect' (${socket.id}) has connected`);
 
       try {
+        console.log('SERVER: FUNCTION fetchNamespaces()')
         // Fetch namespaces from the API
         const namespaces = await fetchNamespaces();
 

@@ -40,56 +40,60 @@ import "./page.css";
 
 export default function ChatPage() {
 
-  const { socketServer } = useSocket();
+  const { socket } = useSocket();
 
   useEffect(() => {
-    let initializedSocketServer = null;
+    console.log('CLIENT: useEffect() called');
+    let initializedSocket = null;
 
     const setupListeners = () => {
-      if(socketServer){
-        initializedSocketServer = socketServer;
+      if(socket){
+        initializedSocket = socket;
         
-        initializedSocketServer.on("connect", () => {
-          console.log("CLIENT: initializedSocketServer 'Connected'");
-          initializedSocketServer.emit("clientConnect");
+        //on the client side, once a connection is established using io() with Socket.IO, the client receives a 'connect' event
+        initializedSocket.on("connect", () => {
+          console.log(`CLIENT: 'connect' -> initializedSocket (${socket.id})`);
+          initializedSocket.emit("clientConnect");
         });
   
-        initializedSocketServer.on("welcome", (data) => {
-          console.log('CLIENT receives "welcome":', data);
+        initializedSocket.on("welcome", (data) => {
+          console.log('CLIENT: receives "welcome":', data);
         });
   
-        initializedSocketServer.on("messageFromServer", (data) => {
+        initializedSocket.on("messageFromServer", (data) => {
           console.log(data);
         });
   
-        initializedSocketServer.on("reconnect", (data) => {
+        initializedSocket.on("reconnect", (data) => {
           console.log("reconnect event!!!");
           console.log(data);
         });
       }
     };
-    setupListeners();
 
     // Function to clean up listeners
     const cleanupListeners = () => {
-      if (initializedSocketServer) {
-        console.log('CLIENT: useEffect() cleanup');
-        initializedSocketServer.off("connect");
-        initializedSocketServer.off("welcome");
-        initializedSocketServer.off("messageFromServer");
-        initializedSocketServer.off("reconnect");
-        initializedSocketServer.disconnect();
+      if (initializedSocket) {
+        console.log('CLIENT: useEffect() cleanup cleanupListeners() called');
+        initializedSocket.off("connect");
+        initializedSocket.off("welcome");
+        initializedSocket.off("messageFromServer");
+        initializedSocket.off("reconnect");
+        initializedSocket.disconnect();
       }
     }
     // Cleanup on component unmount
     /*
     Ensure Cleanup: Always call the cleanup function to remove listeners and disconnect the socket server when the socketServer instance changes or the component unmounts.
     */
+
+    setupListeners();
+
     return () => {
       cleanupListeners();
     };
 
-  }, [socketServer]);
+  }, [socket]);
 
   const handleSubmit = (event) => {
     event.preventDefault();

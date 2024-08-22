@@ -1,5 +1,4 @@
 import "./globals.css";
-import ProviderWrappers from "@/components/ProviderWrappers";
 
 export const metadata = {
   title: "Create Next App",
@@ -9,9 +8,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <ProviderWrappers>
         <body>{children}</body>
-      </ProviderWrappers>
     </html>
   );
 }

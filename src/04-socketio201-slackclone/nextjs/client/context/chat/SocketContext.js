@@ -12,16 +12,16 @@ const initialState = {
   nameSpaceSockets: [],
   listeners: { nsChange: [], messageToRoom: [] },
   selectedNsId: null, //a global variable we update when the user updates the namespace
-  socketServer: null,
+  socket: null,
 };
 
 //reducer
 const reducer = (state, action) => {
   switch (action.type) {
-    case "set_socket_server":
+    case "set_socket":
       return {
         ...state,
-        socketServer: action.payload,
+        socket: action.payload,
       };
     default:
       return state;
@@ -43,7 +43,7 @@ export function SocketContextProvider({ children }) {
     console.log('newSocket: ', newSocket);
 
     dispatch({
-      type: "set_socket_server",
+      type: "set_socket",
       payload: newSocket,
     });
 
@@ -55,7 +55,7 @@ export function SocketContextProvider({ children }) {
   }, []);
   
   return (
-    <SocketContext.Provider value={{socketServer: state.socketServer}}>
+    <SocketContext.Provider value={{socket: state.socket}}>
       {children}
     </SocketContext.Provider>
   );
