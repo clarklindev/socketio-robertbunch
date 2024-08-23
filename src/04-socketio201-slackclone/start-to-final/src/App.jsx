@@ -1,4 +1,5 @@
 import "./styles.css";
+import { io } from "socket.io-client";
 
 function App() {
   // CLIENT

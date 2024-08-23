@@ -1,36 +1,36 @@
-export const room = () => {
+export const Room = () => {
   return (
-    <div class="container-fluid">
-      <div class="row">
+    <div className="container-fluid">
+      <div className="row">
         {/* ROOMS */}
-        <div class="rooms">
+        <div className="rooms">
           
-          <div class="main-rooms">
-            <h6 class="pointer">
-              <i class="room-caret fa-solid fa-caret-down"/>Rooms
+          <div className="main-rooms">
+            <h6 className="pointer">
+              <i className="room-caret fa-solid fa-caret-down"/>Rooms
             </h6>
 
-            <ul class="room-list">
+            <ul className="room-list">
               {/* GENERATE ROOMS DYNAMICALLY */}
               {/* 
-                <li><span class="glyphicon glyphicon-lock"/>Main Room</li>
-                <li><span class="glyphicon glyphicon-globe"/>Meeting Room</li> 
+                <li><span className="glyphicon glyphicon-lock"/>Main Room</li>
+                <li><span className="glyphicon glyphicon-globe"/>Meeting Room</li> 
               */}
             </ul>
           </div>
 
-          <div class="dm">
-            <h6 class="pointer">
-              <i class="room-caret fa-solid fa-caret-down"/>Direct Messages
+          <div className="dm">
+            <h6 className="pointer">
+              <i className="room-caret fa-solid fa-caret-down"/>Direct Messages
             </h6>
 
-            <ul class="room-list">
+            <ul className="room-list">
               <li>
-                <span class="glyphicon glyphicon-lock" />
+                <span className="glyphicon glyphicon-lock" />
                 Main Room
               </li>
               <li>
-                <span class="glyphicon glyphicon-globe" />
+                <span className="glyphicon glyphicon-globe" />
                 Meeting Room
               </li>
             </ul>

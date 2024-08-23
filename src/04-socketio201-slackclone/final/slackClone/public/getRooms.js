@@ -16,10 +16,12 @@ socket.on("connect", () => {
   socket.emit("clientConnect");
 });
 
-//lisen for the nsList event from the server which gives us the namespaces
+//lisen for the nsList event from the server which gives us nsData (namespaces)
 socket.on("nsList", (nsData) => {
   console.log(nsData);
   const nameSapcesDiv = document.querySelector(".namespaces");
+
+  //loop through namespaces
   nsData.forEach((ns) => {
     //update the HTML with each ns
     nameSapcesDiv.innerHTML += `<div class="namespace" ns="${ns.endpoint}"><img src="${ns.image}"></div>`;

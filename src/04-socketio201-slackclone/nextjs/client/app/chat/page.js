@@ -33,14 +33,15 @@
 import { useEffect, useState } from "react";
 import { useSocket } from "@/context/chat/SocketContext"; 
 import { handleMessage } from "@/lib/socket/actions/handleMessage";
-
+import { Namespaces } from "@/components/chat/Namespaces";
 import "./page.css";
+import { Namespace } from "@/components/chat/Namespace";
 
 // CLIENT-SIDE
 
 export default function ChatPage() {
 
-  const { socket } = useSocket();
+  const { socket, setNamespaceList, namespaceList } = useSocket();
 
   useEffect(() => {
     console.log('CLIENT: useEffect() called');
@@ -60,6 +61,11 @@ export default function ChatPage() {
           console.log('CLIENT: receives "welcome":', data);
         });
   
+        initializedSocket.on('nsList', (nsList)=>{
+          console.log('nsList:', nsList);
+          setNamespaceList(nsList);
+        });
+
         initializedSocket.on("messageFromServer", (data) => {
           console.log(data);
         });
@@ -95,6 +101,14 @@ export default function ChatPage() {
 
   }, [socket]);
 
+  const namespaces = (<Namespaces>
+  {
+    namespaceList.map((ns, index)=>{
+      return <Namespace key={index} {...ns}/>
+    })
+  }
+  </Namespaces>);
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const message = event.target.message.value;
@@ -103,7 +117,7 @@ export default function ChatPage() {
 
   return (
     <main>
-      <div className="sidemenu">hey</div>
+      <div className="sidemenu">{namespaces}</div>
       <div className="subsidemenu">yo</div>
       <div className="content">
         <h2 className="room-heading">hello</h2>

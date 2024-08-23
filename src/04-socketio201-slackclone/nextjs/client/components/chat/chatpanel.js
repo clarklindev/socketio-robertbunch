@@ -1,23 +1,23 @@
-export const chatpanel = () => {
+export const Chatpanel = () => {
   return (
-    <div class="chat-panel col">
-      <div class="room-header row col-12">
-        <div class="col">
-          <span class="curr-room-text">Current Room</span>
-          <span class="curr-room-num-users">
-            Users <span class="fa-solid fa-user"></span>
+    <div className="chat-panel col">
+      <div className="room-header row col-12">
+        <div className="col">
+          <span className="curr-room-text">Current Room</span>
+          <span className="curr-room-num-users">
+            Users <span className="fa-solid fa-user"></span>
           </span>
         </div>
 
-        <div class="search">
-          <span class="glyphicon glyphicon-search"></span>
+        <div className="search">
+          <span className="glyphicon glyphicon-search"></span>
           <input type="text" id="search-box" placeholder="Search" />
         </div>
       </div>
 
-      <div class="message-form">
+      <div className="message-form">
         <form id="message-form">
-          <div class="col-sm-12">
+          <div className="col-sm-12">
             <input
               id="user-message"
               type="text"
@@ -26,7 +26,7 @@ export const chatpanel = () => {
           </div>
         </form>
       </div>
-      <ul id="messages" class="col-sm-12"></ul>
+      <ul id="messages" className="col-sm-12"></ul>
     </div>
   );
 };

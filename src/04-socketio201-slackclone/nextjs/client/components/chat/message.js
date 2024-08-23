@@ -10,19 +10,19 @@ messageObj structure:
 
 */
 
-export const message = (messageObj) => {
+export const Message = (messageObj) => {
   return (
     <li>
-      <div class="user-image">
+      <div className="user-image">
         <img src={`${messageObj.avatar}`} />
       </div>
 
-      <div class="user-message">
-        <div class="user-name-time">
+      <div className="user-message">
+        <div className="user-name-time">
           {messageObj.userName}{" "}
           <span>{new Date(messageObj.date).toLocaleString()}</span>
         </div>
-        <div class="message-text">{messageObj.newMessage}</div>
+        <div className="message-text">{messageObj.newMessage}</div>
       </div>
     </li>
   );

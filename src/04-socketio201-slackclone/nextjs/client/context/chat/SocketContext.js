@@ -4,15 +4,19 @@ import { createContext, useReducer, useEffect, useContext} from "react";
 
 //create context
 const SocketContext = createContext({
-  socket:null
+  socket:null,
+  setNamespaceList:()=>{},
+  namespaceList:[], 
 });//if you want auto completion, the passed in object needs the skeleton of functions, constants avail
 
 //prop is the initial context
 const initialState = {
+  namespaceList:[],
   nameSpaceSockets: [],
   listeners: { nsChange: [], messageToRoom: [] },
   selectedNsId: null, //a global variable we update when the user updates the namespace
   socket: null,
+
 };
 
 //reducer
@@ -23,6 +27,13 @@ const reducer = (state, action) => {
         ...state,
         socket: action.payload,
       };
+
+    case "set_nslist":
+      return {
+        ...state,
+        namespaceList: action.payload
+      };
+
     default:
       return state;
   }
@@ -53,9 +64,16 @@ export function SocketContextProvider({ children }) {
       newSocket.disconnect();
     };
   }, []);
+
+  function setNamespaceList(nsList){
+    dispatch({
+      type: "set_nslist",
+      payload: nsList
+    })
+  }
   
   return (
-    <SocketContext.Provider value={{socket: state.socket}}>
+    <SocketContext.Provider value={{socket: state.socket, setNamespaceList, namespaceList: state.namespaceList}}>
       {children}
     </SocketContext.Provider>
   );
