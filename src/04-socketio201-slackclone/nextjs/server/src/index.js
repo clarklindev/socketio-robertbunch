@@ -5,7 +5,7 @@ import http from 'http';
 import cookieParser from "cookie-parser";
 import { Server as SocketIOServer } from 'socket.io';
 
-import { initSocketHandlers } from "./lib/socket/socketHandlers.js";
+import { initDefaultNamespaceHandlers } from "./lib/socket/defaultNamespaceHandlers.js";
 import { initNamespaceHandlers } from "./lib/socket/namespaceHandlers.js";
 import { connectToDatabase, disconnectFromDatabase } from "./lib/socket/db/db.js";
 import socketRoutes from "./api/socket/routes/index.js";
@@ -56,8 +56,8 @@ async function init() {
       }
       console.log(`SERVER: STEP 05 - listening on port ${serverPort}`);
 
-      //initialize listeners (ORDER IMPORTANT: initSocketHandlers requires server api endpoint so server needs to be running first)
-      await initSocketHandlers(io);
+      //initialize listeners (ORDER IMPORTANT: initDefaultNamespaceSocketHandlers requires server api endpoint so server needs to be running first)
+      await initDefaultNamespaceHandlers(io);
       // await initNamespaceHandlers(io);
       console.log('READY...')
     });

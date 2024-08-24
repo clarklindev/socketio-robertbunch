@@ -34,36 +34,42 @@ import { useEffect, useState } from "react";
 import { useSocket } from "@/context/chat/SocketContext"; 
 import { handleMessage } from "@/lib/socket/actions/handleMessage";
 import { Namespaces } from "@/components/chat/Namespaces";
-import "./page.css";
 import { Namespace } from "@/components/chat/Namespace";
+
+import "./page.css";
 
 // CLIENT-SIDE
 
 export default function ChatPage() {
 
-  const { socket, setNamespaceList, namespaceList } = useSocket();
+  const { defaultNamespaceSocket, namespaceList, setNamespaceList, namespaceSockets, selectedNsId  } = useSocket();
+
+  useEffect(()=>{
+    if(defaultNamespaceSocket){
+      //on the client side, once a connection is established using io() with Socket.IO, the client receives a 'connect' event
+      defaultNamespaceSocket.on("connect", () => {
+        console.log("CLIENT: DEFAULT SOCKET 'connect'");
+        defaultNamespaceSocket.emit("default-namespace-connect");
+      });
+
+      defaultNamespaceSocket.on('nsList', (namespaces)=>{
+        setNamespaceList(namespaces);
+      });
+    }
+  }, [defaultNamespaceSocket]);
+
+
 
   useEffect(() => {
     console.log('CLIENT: useEffect() called');
     let initializedSocket = null;
 
     const setupListeners = () => {
-      if(socket){
+      if(selectedNsId && namespaceSockets[selectedNsId]){
         initializedSocket = socket;
         
-        //on the client side, once a connection is established using io() with Socket.IO, the client receives a 'connect' event
-        initializedSocket.on("connect", () => {
-          console.log(`CLIENT: 'connect' -> initializedSocket (${socket.id})`);
-          initializedSocket.emit("clientConnect");
-        });
-  
         initializedSocket.on("welcome", (data) => {
           console.log('CLIENT: receives "welcome":', data);
-        });
-  
-        initializedSocket.on('nsList', (nsList)=>{
-          console.log('nsList:', nsList);
-          setNamespaceList(nsList);
         });
 
         initializedSocket.on("messageFromServer", (data) => {
@@ -99,15 +105,15 @@ export default function ChatPage() {
       cleanupListeners();
     };
 
-  }, [socket]);
+  }, [selectedNsId]);
 
-  const namespaces = (<Namespaces>
-  {
+  
+
+  const namespaces = <Namespaces>{
     namespaceList.map((ns, index)=>{
       return <Namespace key={index} {...ns}/>
     })
-  }
-  </Namespaces>);
+  }</Namespaces>;
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -122,9 +128,6 @@ export default function ChatPage() {
       <div className="content">
         <h2 className="room-heading">hello</h2>
         <ul id="messages" className="messages">
-          <li>hey</li>
-          <li>hey</li>
-          <li>hey</li>
         </ul>
         <form id="form" onSubmit={handleSubmit}>
           <input id="input" name="message" autoComplete="off" />

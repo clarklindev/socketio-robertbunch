@@ -1,4 +1,5 @@
 'use client';
+
 import io from "socket.io-client";
 import { createContext, useReducer, useEffect, useContext} from "react";
 
@@ -8,33 +9,31 @@ const initialState = {
   nameSpaceSockets: [],//each namespace can hold one single socket (by design)
   listeners: { nsChange: [], messageToRoom: [] },
   selectedNsId: null, //a global variable we update when the user updates the namespace
+  defaultNamespaceSocket: null,
 };
 
 //create context - if you want auto completion, the passed in object needs the skeleton of functions, constants avail
 //give rest of code structure (and has functions)
 const SocketContext = createContext({
   ...initialState,
-
-  //exposed functions
-  setNamespaceList:()=>{},
-  setNamespaceSocket:()=>{},
+  setNamespaceList:()=>{}
 });
 
 
 //reducer
 const reducer = (state, action) => {
   switch (action.type) {
-    case "set_nssocket":
-      return {
-        ...state,
-        socket: action.payload,
-      };
-
     case "set_nslist":
       return {
         ...state,
         namespaceList: action.payload
       };
+    
+    case 'set_default_namespace_socket':
+      return {
+        ...state,
+        defaultNamespaceSocket: action.payload
+      }
 
     default:
       return state;
@@ -53,21 +52,18 @@ export function SocketContextProvider({ children }) {
     })
   }
 
-  function setNamespaceSocket(socket){
+  function setDefaultNamespaceSocket(socket){
     dispatch({
-      type: "set_nssocket",
+      type: 'set_default_namespace_socket',
       payload: socket
     })
   }
 
   useEffect(() => {
-
-    // console.log('ENV NEXT_PUBLIC_SERVER_URL:', process.env.NEXT_PUBLIC_SERVER_URL);
-    // console.log('ENV NEXT_PUBLIC_SERVER_PORT:', process.env.NEXT_PUBLIC_SERVER_PORT);
-
-    // Initialize socket connection - default namespaces '/'
-    // const newSocket = io(`${process.env.NEXT_PUBLIC_SERVER_URL}:${process.env.NEXT_PUBLIC_SERVER_PORT}`);
-    // setNamespaceSocket(newSocket);
+    // Initialize socket connection - connect to default namespace '/'
+    //NOTE: io() call triggers SERVER' CALL OF: `io.on("connection", ()=>{})`
+    const newSocket = io(`${process.env.NEXT_PUBLIC_SERVER_URL}:${process.env.NEXT_PUBLIC_SERVER_PORT}`); 
+    setDefaultNamespaceSocket(newSocket);
 
     // Cleanup on component unmount
     return () => {
@@ -78,8 +74,7 @@ export function SocketContextProvider({ children }) {
 
   const context = {
     ...state,
-    setNamespaceList, //use the real function
-    setNamespaceSocket //use the real function
+    setNamespaceList
   }
 
   return (

@@ -96,6 +96,16 @@ export async function initNamespaceHandlers(io) {
         //push message on rooms history[] array
         thisRoom.addMessage(messageObj);
       });
+
+      socket.on("newMessageToServer", (dataFromClient) => {
+        console.log("Data:", dataFromClient);
+        io.emit("newMessageToClients", { text: dataFromClient.text });
+      });
+  
+      //eg. when client closes browser
+      socket.on("disconnect", () => {
+        console.log(`SERVER: receives 'disconnect', (${socket.id}) has disconnected`);
+      });
     });
   });
 }
