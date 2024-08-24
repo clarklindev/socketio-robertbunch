@@ -8,7 +8,6 @@ const initialState = {
   nameSpaceSockets: [],//each namespace can hold one single socket (by design)
   listeners: { nsChange: [], messageToRoom: [] },
   selectedNsId: null, //a global variable we update when the user updates the namespace
-  socket: null,
 };
 
 //create context - if you want auto completion, the passed in object needs the skeleton of functions, constants avail
@@ -25,7 +24,7 @@ const SocketContext = createContext({
 //reducer
 const reducer = (state, action) => {
   switch (action.type) {
-    case "set_socket":
+    case "set_nssocket":
       return {
         ...state,
         socket: action.payload,
@@ -47,27 +46,6 @@ export function SocketContextProvider({ children }) {
   
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  useEffect(() => {
-
-    console.log('ENV NEXT_PUBLIC_SERVER_URL:', process.env.NEXT_PUBLIC_SERVER_URL);
-    console.log('ENV NEXT_PUBLIC_SERVER_PORT:', process.env.NEXT_PUBLIC_SERVER_PORT);
-
-    // Initialize socket connection
-    const newSocket = io(`${process.env.NEXT_PUBLIC_SERVER_URL}:${process.env.NEXT_PUBLIC_SERVER_PORT}`);
-    console.log('newSocket: ', newSocket);
-
-    dispatch({
-      type: "set_socket",
-      payload: newSocket,
-    });
-
-    // Cleanup on component unmount
-    return () => {
-      console.log('CLEANUP SocketContextProvider')
-      newSocket.disconnect();
-    };
-  }, []);
-
   function setNamespaceList(nsList){
     dispatch({
       type: "set_nslist",
@@ -81,10 +59,25 @@ export function SocketContextProvider({ children }) {
       payload: socket
     })
   }
-  
+
+  useEffect(() => {
+
+    // console.log('ENV NEXT_PUBLIC_SERVER_URL:', process.env.NEXT_PUBLIC_SERVER_URL);
+    // console.log('ENV NEXT_PUBLIC_SERVER_PORT:', process.env.NEXT_PUBLIC_SERVER_PORT);
+
+    // Initialize socket connection - default namespaces '/'
+    // const newSocket = io(`${process.env.NEXT_PUBLIC_SERVER_URL}:${process.env.NEXT_PUBLIC_SERVER_PORT}`);
+    // setNamespaceSocket(newSocket);
+
+    // Cleanup on component unmount
+    return () => {
+      console.log('CLEANUP SocketContextProvider')
+      newSocket.disconnect();
+    };
+  }, []);
+
   const context = {
     ...state,
-
     setNamespaceList, //use the real function
     setNamespaceSocket //use the real function
   }

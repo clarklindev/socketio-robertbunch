@@ -16,8 +16,17 @@ const clientOptions = {
   },
 };
 
-//always join the main namespace, because that's where the client gets the other namespaces from
-const socket = io("http://localhost:9000", clientOptions);
+/*
+//always join the main namespace, because that's where the client gets the other namespaces from: ie after joining main namespace...
+SERVER only then emits the nsList:
+
+  socket.on("clientConnect", (data) => {
+    console.log(socket.id, "has connected");
+    socket.emit("nsList", namespaces);
+  });
+
+*/
+const socket = io("http://localhost:9000", clientOptions);//join main namespace '/'
 // const socket2 = io('http://localhost:9000/wiki');
 // const socket3 = io('http://localhost:9000/mozilla');
 // const socket4 = io('http://localhost:9000/linux');
@@ -30,7 +39,8 @@ const listeners = {
   messageToRoom: [],
 };
 
-//a global variable we can update when the user clicks on a namespace
+//a global variable we can update when the user clicks on a namespace 
+//NOTE TO SELF: DESPITE THE TUTORIAL USING GLOBALS LIKE THIS... IT IS NOT GOOD PRACTICE find state management package 
 //we will use it to broadcast across the app (redux would be great here...)
 let selectedNsId = 0; //track current namespace's id
 
@@ -56,8 +66,9 @@ document.querySelector("#message-form").addEventListener("submit", (e) => {
 //this prevents listeners being added multiples times and makes life
 //better for us as developers.
 const addListeners = (nsId) => {
-  // namespaceSockets[ns.id] = thisNs;
+  
   if (!listeners.nsChange[nsId]) {
+    //adding listeners to the socket
     namespaceSockets[nsId].on("nsChange", (data) => {
       console.log("Namespace Changed!");
       console.log(data);
@@ -66,7 +77,7 @@ const addListeners = (nsId) => {
   }
 
   if (!listeners.messageToRoom[nsId]) {
-    //add the nsId listener to this namespace!
+    //adding listeners to the socket
     namespaceSockets[nsId].on("messageToRoom", (messageObj) => {
       console.log(messageObj);
       document.querySelector("#messages").innerHTML +=
@@ -99,12 +110,20 @@ socket.on("nsList", (nsData) => {
     if (!namespaceSockets[ns.id]) {
       //There is no socket at this nsId. So make a new connection!
       //join this namespace with io()
+      //NOTE: the namespace endpoint (ns.endpoint) has prefix '/'
       namespaceSockets[ns.id] = io(`http://localhost:9000${ns.endpoint}`);
     }
     addListeners(ns.id);
   });
 
-  Array.from(document.getElementsByClassName("namespace")).forEach(
+
+  const namespaceElements = document.getElementsByClassName("namespace");
+
+  // Convert HTMLCollection to an array for easier manipulation
+  const namespaceArray = Array.from(namespaceElements);
+
+  //add listeners
+  namespaceArray.forEach(
     (element) => {
       element.addEventListener("click", (e) => {
         console.log(element);
@@ -113,6 +132,12 @@ socket.on("nsList", (nsData) => {
     }
   );
 
-  //if lastNs is set, grab that element instead of 0.
-  joinNs(document.getElementsByClassName("namespace")[0], nsData);
+  // Find the element with the 'ns' attribute equal to lastNs
+  const targetElement = namespaceArray.find(element => element.getAttribute('ns') === lastNs);
+
+  // If such an element is found, use it; otherwise, default to the first element
+  const elementToJoin = targetElement || namespaceArray[selectedNsId];
+
+  // Join the namespace
+  joinNs(elementToJoin, nsData);
 });

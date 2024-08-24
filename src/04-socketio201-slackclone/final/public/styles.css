@@ -109,10 +109,12 @@ input {
     max-height: 85%;
     overflow: scroll;
 }
-#messages li .user-image{
+
+/* #messages li .user-image{ */
     /* width: 50px; */
     /* display: inline-block; */
-}
+/* }  */
+
 #messages li .user-message{
     margin-left: 10px;
     color: #fff;
