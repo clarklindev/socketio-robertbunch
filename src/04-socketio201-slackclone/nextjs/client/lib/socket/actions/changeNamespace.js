@@ -1,5 +1,3 @@
-import namespaces from "@/data/chat/namespaces";
-
 export function changeNamespace(req, res) {
   const io = res.socket.server.io;
 

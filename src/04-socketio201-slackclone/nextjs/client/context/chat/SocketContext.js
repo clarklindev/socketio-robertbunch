@@ -2,22 +2,25 @@
 import io from "socket.io-client";
 import { createContext, useReducer, useEffect, useContext} from "react";
 
-//create context
-const SocketContext = createContext({
-  socket:null,
-  setNamespaceList:()=>{},
-  namespaceList:[], 
-});//if you want auto completion, the passed in object needs the skeleton of functions, constants avail
-
-//prop is the initial context
+//prop is the initial context (only values)
 const initialState = {
   namespaceList:[],
-  nameSpaceSockets: [],
+  nameSpaceSockets: [],//each namespace can hold one single socket (by design)
   listeners: { nsChange: [], messageToRoom: [] },
   selectedNsId: null, //a global variable we update when the user updates the namespace
   socket: null,
-
 };
+
+//create context - if you want auto completion, the passed in object needs the skeleton of functions, constants avail
+//give rest of code structure (and has functions)
+const SocketContext = createContext({
+  ...initialState,
+
+  //exposed functions
+  setNamespaceList:()=>{},
+  setNamespaceSocket:()=>{},
+});
+
 
 //reducer
 const reducer = (state, action) => {
@@ -71,9 +74,23 @@ export function SocketContextProvider({ children }) {
       payload: nsList
     })
   }
+
+  function setNamespaceSocket(socket){
+    dispatch({
+      type: "set_nssocket",
+      payload: socket
+    })
+  }
   
+  const context = {
+    ...state,
+
+    setNamespaceList, //use the real function
+    setNamespaceSocket //use the real function
+  }
+
   return (
-    <SocketContext.Provider value={{socket: state.socket, setNamespaceList, namespaceList: state.namespaceList}}>
+    <SocketContext.Provider value={context}>
       {children}
     </SocketContext.Provider>
   );
@@ -81,7 +98,7 @@ export function SocketContextProvider({ children }) {
 
 // Custom Hook for Using Socket
 export const useSocket = () => {
-  const context = useContext(SocketContext);
+  const context = useContext(SocketContext);  //pass the shell context
   if (!context) {
     throw new Error("useSocket must be used within a SocketContextProvider");
   }

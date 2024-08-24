@@ -16,9 +16,9 @@ const socket = io("http://localhost:9000");
 socket.on("nsList", (nsData) => {
   const lastNs = localStorage.getItem("lastNs");
 
-  console.log("nsData: ", nsData);
-  const namespacesDiv = document.querySelector(".namespaces");
-  namespacesDiv.innerHTML = "";
+  // console.log("nsData: ", nsData);
+  // const namespacesDiv = document.querySelector(".namespaces");
+  // namespacesDiv.innerHTML = "";
 
   //populate namespaces
   nsData.forEach((ns) => {
@@ -32,7 +32,7 @@ socket.on("nsList", (nsData) => {
     if (!nameSpaceSockets[ns.id]) {
       // join the namespace with io()
       // thisNs = io(`http://localhost:9000${ns.endpoint}`);
-      nameSpaceSockets[ns.id] = io(`${socketUrl}${ns.endpoint}`);
+      nameSpaceSockets[ns.id] = io(`${socketUrl}/${ns.endpoint}`);
     }
 
     //lesson 38
