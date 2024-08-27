@@ -16,23 +16,35 @@ const initialState = {
 //give rest of code structure (and has functions)
 const SocketContext = createContext({
   ...initialState,
-  setNamespaceList:()=>{}
+  setNamespaceList:()=>{},
+  setSelectedNamespaceId: ()=>{},
 });
 
+const ActionType = Object.freeze({
+  SET_NAMESPACE_LIST: 'set_nslist',
+  SET_DEFAULT_NAMESPACE_SOCKET: 'set_default_namespace_socket',
+  SET_SELECTED_NAMESPACE_ID: 'set_selected_namespace_id',
+});
 
 //reducer
 const reducer = (state, action) => {
   switch (action.type) {
-    case "set_nslist":
+    case ActionType.SET_NAMESPACE_LIST:
       return {
         ...state,
         namespaceList: action.payload
       };
     
-    case 'set_default_namespace_socket':
+    case ActionType.SET_DEFAULT_NAMESPACE_SOCKET:
       return {
         ...state,
         defaultNamespaceSocket: action.payload
+      }
+    
+    case ActionType.SET_SELECTED_NAMESPACE_ID:
+      return {
+        ...state,
+        selectedNsId: action.payload
       }
 
     default:
@@ -47,14 +59,21 @@ export function SocketContextProvider({ children }) {
 
   function setNamespaceList(nsList){
     dispatch({
-      type: "set_nslist",
+      type: ActionType.SET_NAMESPACE_LIST,
       payload: nsList
+    })
+  }
+
+  function setSelectedNamespaceId(nsId){
+    dispatch({
+      type: ActionType.SET_DEFAULT_NAMESPACE_SOCKET,
+      payload: nsId
     })
   }
 
   function setDefaultNamespaceSocket(socket){
     dispatch({
-      type: 'set_default_namespace_socket',
+      type: ActionType.SET_DEFAULT_NAMESPACE_SOCKET,
       payload: socket
     })
   }
@@ -74,7 +93,8 @@ export function SocketContextProvider({ children }) {
 
   const context = {
     ...state,
-    setNamespaceList
+    setNamespaceList,
+    setSelectedNamespaceId
   }
 
   return (

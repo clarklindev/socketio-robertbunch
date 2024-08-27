@@ -1,3 +1,17 @@
 .namespace-icon {
   object-fit: scale-down;
+  cursor: pointer;
+}
+
+.placeholder{
+  width: 100px;
+  height: 50px;
+  object-fit: scale-down;
+  border: 1px solid black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 10px;
+  cursor: pointer;
 }

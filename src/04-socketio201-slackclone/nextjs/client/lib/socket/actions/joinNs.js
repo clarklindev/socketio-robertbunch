@@ -1,12 +1,13 @@
 // We could ask the server for fresh info on this NS. BAD!!
 // We have socket.io/ws, and the server will tell us when something has happened!
 
-function joinNs(element, nsData) {
-  const nsEndpoint = element.getAttribute("ns"); //gets ns="" attribute
-
+//change out so its not using DOM references but rather 'clickedEndpoint' prop
+//NOTE: the data is coming from nsList so there shouldnt be a need to go through nsData again
+//NOTE: ...BUT THE WHOLE POINT IS TO RETURN THE ID USING THE ENDPOINT
+export function joinNs(clickedEndpoint) {
+  
   //find the ns (returns Namespace instance) in nsData with endpoint same as the one user clicked on
-  const clickedNs = nsData.find((row) => row.endpoint === nsEndpoint);
-
+  const clickedNs = nsData.find((namespace) => namespace.endpoint === clickedEndpoint);
   //global- so we can submit message to the right place
   selectedNsId = clickedNs.id;
   const rooms = clickedNs.rooms;

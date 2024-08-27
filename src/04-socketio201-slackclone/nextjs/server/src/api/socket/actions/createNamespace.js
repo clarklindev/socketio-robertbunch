@@ -1,5 +1,21 @@
 import Namespace from "../../../lib/socket/db/models/NamespaceModel.js";
 
+/*POSTMAN
+POST: http://localhost:3000/api/socket/namespaces
+
+headers: {Content-Type: application/json}
+
+body (json):
+
+{
+  "data": {
+    "name": "pony",
+    "image": "",
+    "endpoint": "/pony"
+  }
+}
+*/
+
 export async function createNamespace(req, res, next) {
   const { data } = req.body; // Assume 'data' contains the namespace information
   console.log(data);

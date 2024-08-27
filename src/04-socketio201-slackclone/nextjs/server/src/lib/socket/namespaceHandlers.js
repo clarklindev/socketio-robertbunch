@@ -11,7 +11,7 @@ export async function initNamespaceHandlers(io) {
   NOTE: use `io.of(namespace.endpoint)` for interacting with the Socket.IO namespace directly, 
   NOTE: use `namespaces[roomObj.namespaceId]` when you need access to custom namespace-related data.
   */
-  console.log("SERVER: STEP 07 - fetchNamespaces()");
+  console.log("SERVER: STEP 07 - FUNCTION fetchNamespaces()");
   const namespaces = await fetchNamespaces();
 
   namespaces.forEach((namespace) => {

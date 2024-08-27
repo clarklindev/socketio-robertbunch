@@ -52,6 +52,10 @@ export default function ChatPage() {
         defaultNamespaceSocket.emit("default-namespace-connect");
       });
 
+      defaultNamespaceSocket.on("welcome", (data) => {
+        console.log('CLIENT: receives "welcome":', data);
+      });
+
       defaultNamespaceSocket.on('nsList', (namespaces)=>{
         setNamespaceList(namespaces);
       });
@@ -66,12 +70,8 @@ export default function ChatPage() {
 
     const setupListeners = () => {
       if(selectedNsId && namespaceSockets[selectedNsId]){
-        initializedSocket = socket;
+        initializedSocket = namespaceSockets[selectedNsId];
         
-        initializedSocket.on("welcome", (data) => {
-          console.log('CLIENT: receives "welcome":', data);
-        });
-
         initializedSocket.on("messageFromServer", (data) => {
           console.log(data);
         });

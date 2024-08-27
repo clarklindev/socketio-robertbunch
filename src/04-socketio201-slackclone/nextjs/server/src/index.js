@@ -8,7 +8,9 @@ import { Server as SocketIOServer } from 'socket.io';
 import { initDefaultNamespaceHandlers } from "./lib/socket/defaultNamespaceHandlers.js";
 import { initNamespaceHandlers } from "./lib/socket/namespaceHandlers.js";
 import { connectToDatabase, disconnectFromDatabase } from "./lib/socket/db/db.js";
+
 import socketRoutes from "./api/socket/routes/index.js";
+import validateRoutes from './api/validate/routes/index.js';
 
 let io;
 let server;
@@ -31,6 +33,8 @@ async function init() {
     app.use(cookieParser()); //Cookie parsing middleware
     app.use(express.json()); //parse json application/json
     app.use("/api/socket", socketRoutes);
+    app.use('/api/validate', validateRoutes);
+
     app.use((req, res) => {
       res.status(404).json({ status: "ERROR", message: "SERVER: Page Not Found" });    //handle all misc routes
     });
@@ -57,9 +61,14 @@ async function init() {
       console.log(`SERVER: STEP 05 - listening on port ${serverPort}`);
 
       //initialize listeners (ORDER IMPORTANT: initDefaultNamespaceSocketHandlers requires server api endpoint so server needs to be running first)
-      await initDefaultNamespaceHandlers(io);
-      // await initNamespaceHandlers(io);
-      console.log('READY...')
+      try{
+        await initDefaultNamespaceHandlers(io);
+        await initNamespaceHandlers(io)
+        console.log('READY...')
+      }
+      catch(error){
+        console.error('error initializing handlers: ', error);
+      }
     });
 
     // Handle graceful shutdown
