@@ -120,3 +120,18 @@ io.on('connection',(socket)=>{
 
 ## Server
 - to talk to specific socket: socket.emit()
+
+## README
+- so whats happening is you have:
+    - server - chat.js
+    - client - public/chat.html
+
+run chat.html (localhost:8000/chat.html)
+run server (nodemon chat.js)
+
+- client form submits message (emits 'newMessageToServer') to server
+- server is listening for this event and broadcasts to all clients:
+
+`io.emit('newMessageToClients',{text:dataFromClient.text});`
+
+- clients listening to "newMessageToClients" receives message and does something with it 
